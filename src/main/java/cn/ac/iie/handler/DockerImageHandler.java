@@ -9,9 +9,14 @@ import java.util.Map;
  * @author Fighter Created on 2018/9/26.
  */
 public interface DockerImageHandler {
-    Map<String,String> load(String imagePath);
-    void tag(String image, String repo, String tag);
-    void push(String image, String repo, String tag);
+    Map<String, String> load(String imagePath);
+
+    void tag(String oldImageNameAndTag, String newImageName, String newTag);
+
+    void push(String imageNameAndTag);
+
+    void pull(String imageNameAndTag);
+
     List<Image> getImages();
 
 }

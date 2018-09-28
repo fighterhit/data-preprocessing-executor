@@ -1,4 +1,4 @@
-package cn.ac.iie.config;
+package cn.ac.iie.common;
 
 import cn.ac.iie.ProxyMain;
 import com.github.dockerjava.api.DockerClient;

@@ -1,4 +1,4 @@
-package cn.ac.iie.config;
+package cn.ac.iie.common;
 
 /**
  * @author Fighter Created on 2018/9/27.
@@ -12,4 +12,7 @@ public interface Constants {
     String DOCKER_CONNECT_TIMEOUT="docker.connect.timeout";
     String DOCKER_MAX_TOTAL_CONNECTIONS="docker.max.total.connections";
     String DOCKER_MAX_PER_ROUTE_CONNNECTIONS ="docker.max.per.route.connections";
+    String REGISTRY_REPO_NAME = "registry.repo.name";
+    String REGISTRY_PROJECT_NAME = "registry.project.name";
+
 }

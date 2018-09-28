@@ -9,11 +9,10 @@ import com.github.dockerjava.core.command.PullImageResultCallback;
 import com.github.dockerjava.core.command.PushImageResultCallback;
 import com.github.dockerjava.jaxrs.JerseyDockerCmdExecFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,22 +58,61 @@ public class HarborAPITest {
     }
 
     public static void main(String[] args) throws InterruptedException {
+        DockerClient dockerClient = dockerClient();
+//        String path = "G:\\IdeaProjects\\docker-registry-proxy\\src\\test\\java\\image_1.0.tar";
+//        testLoad(dockerClient, path);
+//        testTag(dockerClient, "192.168.11.112/hlg_web/busybox:harbortest");
+        testGetImages(dockerClient);
+    }
 
 
+    static void testGetImagesFromRegistry(DockerClient dockerClient) {
+        List<Image> images = null;
+        try {
+            images = dockerClient.listImagesCmd().exec();
+            System.out.println(images);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
-    void testLoad(DockerClient dockerClient,String imagePath){
-        Path path = Paths.get(imagePath);
+    static void testGetImages(DockerClient dockerClient) {
+         List<Image> images = null;
         try {
-            String[] imageNameAndTag = imagePath.split("_");
-            InputStream uploadStream = Files.newInputStream(path);
+            images = dockerClient.listImagesCmd().exec();
+            System.out.println(images);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    static void testTag(DockerClient dockerClient, String oldImageName) {
+        StringBuffer sb = new StringBuffer();
+        String newImageName = sb.append("192.168.11.112")
+                .append("/")
+                .append("hlg_web")
+                .append("/")
+                .append("busybox")
+                .toString();
+        String newTag = "test";
+        dockerClient.tagImageCmd(oldImageName, newImageName, newTag).exec();
+    }
+
+    static void testLoad(DockerClient dockerClient, String imagePath) {
+        try {
+            File file = new File(imagePath.trim());
+            String fileName = file.getName();
+            String[] imageNameAndTag = fileName.substring(0, fileName.lastIndexOf('.')).split("_");
+            InputStream uploadStream = new FileInputStream(file);
             dockerClient.loadImageCmd(uploadStream).exec();
             Map<String, String> map = new HashMap<>();
             map.put("imageName", imageNameAndTag[0]);
             map.put("tag", imageNameAndTag[1]);
             System.out.println(map);
         } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
