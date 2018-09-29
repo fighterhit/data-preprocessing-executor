@@ -14,7 +14,6 @@ import org.apache.http.client.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +35,7 @@ public class RegistryHandlerImpl implements RegistryHandler {
 
     @Override
     public List<Project> listProjects() {
-        List<Project> projects = new ArrayList<>();
+        List<Project> projects = null;
         try {
             Map<String, String> headers = new HashMap<>();
             headers.put("accept", "application/json");
@@ -44,7 +43,7 @@ public class RegistryHandlerImpl implements RegistryHandler {
             String reqUrl = new StringBuffer(harborBaseAPI).append("/").append("projects").toString();
             HttpClientResult result = HttpClientUtils.doGet(reqUrl, headers, null);
             JSONArray jsonArray = JSON.parseArray(result.getContent());
-            return jsonArray.toJavaList(Project.class);
+            projects = jsonArray.toJavaList(Project.class);
         } catch (Exception e) {
             LOGGER.error("list projects error! {}", e);
         }
@@ -53,7 +52,7 @@ public class RegistryHandlerImpl implements RegistryHandler {
 
     @Override
     public List<Repository> listRepostories(String projectId) {
-        List<Repository> repositories = new ArrayList<>();
+        List<Repository> repositories = null;
         try {
             Map<String, String> headers = new HashMap<>();
             headers.put("accept", "application/json");
@@ -63,7 +62,7 @@ public class RegistryHandlerImpl implements RegistryHandler {
             String reqUrl = new StringBuffer(harborBaseAPI).append("/").append("repositories").toString();
             HttpClientResult result = HttpClientUtils.doGet(reqUrl, headers, params);
             JSONArray jsonArray = JSON.parseArray(result.getContent());
-            return jsonArray.toJavaList(Repository.class);
+            repositories = jsonArray.toJavaList(Repository.class);
         } catch (Exception e) {
             LOGGER.error("list repostories error! {}", e);
         }
@@ -82,7 +81,7 @@ public class RegistryHandlerImpl implements RegistryHandler {
                     .append("/repositories/")
                     .append(repositoryName)
                     .toString();
-            result = HttpClientUtils.doDelete(reqUrl, headers, null);
+            result = HttpClientUtils.doDelete(reqUrl, headers);
             retCode = result.getCode();
         } catch (Exception e) {
             LOGGER.error("delete repository error! {}", e);
@@ -104,7 +103,7 @@ public class RegistryHandlerImpl implements RegistryHandler {
                     .append("/tags/")
                     .append(tag)
                     .toString();
-            result = HttpClientUtils.doDelete(reqUrl, headers, null);
+            result = HttpClientUtils.doDelete(reqUrl, headers);
             retCode = result.getCode();
         } catch (Exception e) {
             LOGGER.error("delete repository error! {}", e);
@@ -114,7 +113,7 @@ public class RegistryHandlerImpl implements RegistryHandler {
 
     @Override
     public List<String> listTagsOfRepository(String repositoryName) {
-        List<String> tags = new ArrayList<>();
+        List<String> tags = null;
         try {
             Map<String, String> headers = new HashMap<>();
             headers.put("accept", "application/json");

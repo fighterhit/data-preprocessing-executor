@@ -229,38 +229,25 @@ public class HttpClientUtils {
     }
 
     /**
-     * 发送delete请求；带请求参数
-     *
-     * @param url    请求地址
-     * @param params 参数集合
-     * @return
-     * @throws Exception
-     */
-    public static HttpClientResult doDelete(String url, Map<String, String> params) throws Exception {
-        if (params == null) {
-            params = new HashMap<>();
-        }
-
-        params.put("_method", "delete");
-        return doPost(url, params);
-    }
-
-    /**
      * 发送delete请求；带请求头
      *
      * @param url     请求地址
      * @param headers 请求头
-     * @param params  参数集合
      * @return
      * @throws Exception
      */
-    public static HttpClientResult doDelete(String url, Map<String, String> headers, Map<String, String> params) throws Exception {
-        if (params == null) {
-            params = new HashMap<>();
+    public static HttpClientResult doDelete(String url, Map<String, String> headers) throws Exception {
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpDelete httpDelete = new HttpDelete(url);
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(CONNECT_TIMEOUT).setSocketTimeout(SOCKET_TIMEOUT).build();
+        httpDelete.setConfig(requestConfig);
+        packageHeader(headers,httpDelete);
+        CloseableHttpResponse httpResponse = null;
+        try {
+            return getHttpClientResult(httpResponse, httpClient, httpDelete);
+        } finally {
+            release(httpResponse, httpClient);
         }
-
-        params.put("_method", "delete");
-        return doPost(url, headers, params);
     }
 
     /**
