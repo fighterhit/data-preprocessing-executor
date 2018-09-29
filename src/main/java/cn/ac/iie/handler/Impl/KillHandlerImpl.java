@@ -23,16 +23,13 @@ public class KillHandlerImpl implements KillHandler {
     @Override
     public void startShutdownHook() {
 
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (service != null) {
-                    service.stop();
-                    //some clean operation
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (service != null) {
+                service.stop();
+                //some clean operation
 
 
-                    System.exit(0);
-                }
+                System.exit(0);
             }
         }));
 

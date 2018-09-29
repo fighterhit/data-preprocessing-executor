@@ -14,5 +14,6 @@ public interface Constants {
     String DOCKER_MAX_PER_ROUTE_CONNNECTIONS ="docker.max.per.route.connections";
     String REGISTRY_REPO_NAME = "registry.repo.name";
     String REGISTRY_PROJECT_NAME = "registry.project.name";
-
+    String HARBOR_BASEAPI= "harbor.base.api";
+    String HTTP_HEADER_AUTHORIZATION = "http.header.authorization";
 }
