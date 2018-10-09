@@ -1,3 +1,4 @@
+import FTPTest.FtpUtils;
 import cn.ac.iie.common.DockerConfig;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.model.AuthConfig;
@@ -8,10 +9,7 @@ import com.github.dockerjava.core.command.PullImageResultCallback;
 import com.github.dockerjava.core.command.PushImageResultCallback;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +26,21 @@ public class DockerAPITest {
 
     @Test
     void testLoad() {
+        try {
+            FtpUtils ftp = new FtpUtils();
+            //没反应
+            InputStream uploadStream = ftp.ftpClient.retrieveFileStream("image_1.0.tar");
+            dockerClient.loadImageCmd(uploadStream).exec();
+//            ftp.downFile("thinkphp_5.0.10_full.zip","thinkphp_5.0.10_full.zip");
+//            ftp.downFile("image_1.0.tar","image_1.0.tar");
+//            ftp.ftpClient.retrieveFile("test.txt",new FileOutputStream("test.txt"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void testLoad2() {
         Map<String, String> map = null;
         try {
             String imagePath = "G:\\IdeaProjects\\docker-registry-proxy\\src\\test\\java\\image_1.0.tar";

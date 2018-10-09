@@ -25,7 +25,7 @@ public class KillHandlerImpl implements KillHandler {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (service != null) {
-                service.stop();
+//                service.stop();
                 //some clean operation
 
 

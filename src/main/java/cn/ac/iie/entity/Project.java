@@ -107,7 +107,6 @@ public class Project {
 
     public static class MetadataBean {
 
-        @com.google.gson.annotations.SerializedName("public")
         private String publicX;
 
         public String getPublicX() {

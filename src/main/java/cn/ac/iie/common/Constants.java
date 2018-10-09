@@ -8,12 +8,14 @@ public interface Constants {
     String REGISTRY_URL = "registry.url";
     String REGISTRY_USERNAME = "registry.username";
     String REGISTRY_PASSWORD = "registry.password";
-    String DOCKER_READ_TIMEOUT="docker.read.timeout";
-    String DOCKER_CONNECT_TIMEOUT="docker.connect.timeout";
-    String DOCKER_MAX_TOTAL_CONNECTIONS="docker.max.total.connections";
-    String DOCKER_MAX_PER_ROUTE_CONNNECTIONS ="docker.max.per.route.connections";
+    String DOCKER_READ_TIMEOUT = "docker.read.timeout";
+    String DOCKER_CONNECT_TIMEOUT = "docker.connect.timeout";
+    String DOCKER_MAX_TOTAL_CONNECTIONS = "docker.max.total.connections";
+    String DOCKER_MAX_PER_ROUTE_CONNNECTIONS = "docker.max.per.route.connections";
     String REGISTRY_REPO_NAME = "registry.repo.name";
     String REGISTRY_PROJECT_NAME = "registry.project.name";
-    String HARBOR_BASEAPI= "harbor.base.api";
+    String HARBOR_BASEAPI = "harbor.base.api";
     String HTTP_HEADER_AUTHORIZATION = "http.header.authorization";
+    String JETTY_SERVER_PORT = "jetty.server.port";
+    String JETTY_SERVER_PARALLEL = "jetty.server.parallel";
 }

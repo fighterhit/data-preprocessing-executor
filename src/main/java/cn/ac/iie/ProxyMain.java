@@ -1,5 +1,6 @@
 package cn.ac.iie;
 
+import cn.ac.iie.common.Constants;
 import cn.ac.iie.handler.Impl.KillHandlerImpl;
 import cn.ac.iie.proxy.RegistryProxyServer;
 import org.apache.commons.configuration2.FileBasedConfiguration;
@@ -20,7 +21,7 @@ public class ProxyMain {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProxyMain.class);
     private static final String PROPERTIES_PATH;
     public static FileBasedConfiguration conf;
-    private static RegistryProxyServer service = new RegistryProxyServer();
+    private static RegistryProxyServer service;
 
     static {
         PROPERTIES_PATH = ClassLoader.getSystemClassLoader()
@@ -35,6 +36,13 @@ public class ProxyMain {
             conf = initConfiguration();
         } catch (ConfigurationException e) {
             LOGGER.error("init conf error: {}", ExceptionUtils.getFullStackTrace(e));
+            System.exit(1);
+        }
+
+        try {
+            service = new RegistryProxyServer(conf.getInt(Constants.JETTY_SERVER_PORT), conf.getInt(Constants.JETTY_SERVER_PARALLEL));
+        } catch (Exception e) {
+            LOGGER.error("jetty server start error: {}", e);
             System.exit(1);
         }
     }
@@ -58,8 +66,6 @@ public class ProxyMain {
 
 
             //启动代理服务
-
-
 
 
             LOGGER.info("registry service start success...");
