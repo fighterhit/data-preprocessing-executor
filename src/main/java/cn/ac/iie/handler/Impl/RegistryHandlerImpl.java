@@ -7,10 +7,13 @@ import cn.ac.iie.entity.Project;
 import cn.ac.iie.entity.Repository;
 import cn.ac.iie.entity.Tag;
 import cn.ac.iie.handler.RegistryHandler;
+import cn.ac.iie.proxy.result.CodeMsg;
+import cn.ac.iie.proxy.result.Result;
 import cn.ac.iie.util.HttpClientUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import org.apache.http.client.HttpClient;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,14 +31,13 @@ public class RegistryHandlerImpl implements RegistryHandler {
     private String authorization;
     private String harborBaseAPI;
 
-    public RegistryHandlerImpl(HttpClient client) {
+    public RegistryHandlerImpl() {
         harborBaseAPI = ProxyMain.conf.getString(Constants.HARBOR_BASEAPI);
         authorization = ProxyMain.conf.getString(Constants.HTTP_HEADER_AUTHORIZATION);
     }
 
     @Override
-    public List<Project> listProjects() {
-        List<Project> projects = null;
+    public Result<List<Project>> listProjects() {
         try {
             Map<String, String> headers = new HashMap<>();
             headers.put("accept", "application/json");
@@ -43,16 +45,16 @@ public class RegistryHandlerImpl implements RegistryHandler {
             String reqUrl = new StringBuffer(harborBaseAPI).append("/").append("projects").toString();
             HttpClientResult result = HttpClientUtils.doGet(reqUrl, headers, null);
             JSONArray jsonArray = JSON.parseArray(result.getContent());
-            projects = jsonArray.toJavaList(Project.class);
+            List<Project> projects = jsonArray.toJavaList(Project.class);
+            return Result.success(projects);
         } catch (Exception e) {
             LOGGER.error("list projects error! {}", e);
+            return Result.error(CodeMsg.LIST_REGISTRY_ERROR);
         }
-        return projects;
     }
 
     @Override
-    public List<Repository> listRepostories(String projectId) {
-        List<Repository> repositories = null;
+    public Result<List<Repository>> listRepostories(String projectId) {
         try {
             Map<String, String> headers = new HashMap<>();
             headers.put("accept", "application/json");
@@ -62,17 +64,16 @@ public class RegistryHandlerImpl implements RegistryHandler {
             String reqUrl = new StringBuffer(harborBaseAPI).append("/").append("repositories").toString();
             HttpClientResult result = HttpClientUtils.doGet(reqUrl, headers, params);
             JSONArray jsonArray = JSON.parseArray(result.getContent());
-            repositories = jsonArray.toJavaList(Repository.class);
+            List<Repository> repositories = jsonArray.toJavaList(Repository.class);
+            return Result.success(repositories);
         } catch (Exception e) {
             LOGGER.error("list repostories error! {}", e);
+            return Result.error(CodeMsg.LIST_REPOSITORY_ERROR);
         }
-        return repositories;
     }
 
     @Override
-    public int deleteRepository(String repositoryName) {
-        int retCode = -1;
-        HttpClientResult result;
+    public Result<Integer> deleteRepository(String repositoryName) {
         try {
             Map<String, String> headers = new HashMap<>();
             headers.put("accept", "application/json");
@@ -81,18 +82,18 @@ public class RegistryHandlerImpl implements RegistryHandler {
                     .append("/repositories/")
                     .append(repositoryName)
                     .toString();
-            result = HttpClientUtils.doDelete(reqUrl, headers);
-            retCode = result.getCode();
+            HttpClientResult result = HttpClientUtils.doDelete(reqUrl, headers);
+            if (HttpStatus.OK_200 == result.getCode()) {
+                return Result.success(0);
+            }
         } catch (Exception e) {
             LOGGER.error("delete repository error! {}", e);
         }
-        return retCode;
+        return Result.error(CodeMsg.REMOVE_IMAGE_REGISTRY_ERROR);
     }
 
     @Override
-    public int deleteRepository(String repositoryName, String tag) {
-        int retCode = -1;
-        HttpClientResult result;
+    public Result<Integer> deleteRepository(String repositoryName, String tag) {
         try {
             Map<String, String> headers = new HashMap<>();
             headers.put("accept", "application/json");
@@ -103,17 +104,18 @@ public class RegistryHandlerImpl implements RegistryHandler {
                     .append("/tags/")
                     .append(tag)
                     .toString();
-            result = HttpClientUtils.doDelete(reqUrl, headers);
-            retCode = result.getCode();
+            HttpClientResult result = HttpClientUtils.doDelete(reqUrl, headers);
+            if (HttpStatus.OK_200 == result.getCode()) {
+                return Result.success(0);
+            }
         } catch (Exception e) {
-            LOGGER.error("delete repository error! {}", e);
+            LOGGER.error("delete repository error! {}", ExceptionUtils.getFullStackTrace(e));
         }
-        return retCode;
+        return Result.error(CodeMsg.REMOVE_IMAGE_REGISTRY_ERROR);
     }
 
     @Override
-    public List<String> listTagsOfRepository(String repositoryName) {
-        List<String> tags = null;
+    public Result<List<String>> listTagsOfRepository(String repositoryName) {
         try {
             Map<String, String> headers = new HashMap<>();
             headers.put("accept", "application/json");
@@ -125,10 +127,11 @@ public class RegistryHandlerImpl implements RegistryHandler {
                     .toString();
             HttpClientResult result = HttpClientUtils.doGet(reqUrl, headers, null);
             JSONArray jsonArray = JSON.parseArray(result.getContent());
-            tags = jsonArray.toJavaList(Tag.class).stream().map(Tag::getName).collect(Collectors.toList());
+            List<String> tags = jsonArray.toJavaList(Tag.class).stream().map(Tag::getName).collect(Collectors.toList());
+            return Result.success(tags);
         } catch (Exception e) {
             LOGGER.error("list tags error! {}", e);
+            return Result.error(CodeMsg.LIST_TAG_ERROR);
         }
-        return tags;
     }
 }

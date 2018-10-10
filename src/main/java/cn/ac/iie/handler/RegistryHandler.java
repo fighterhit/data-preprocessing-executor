@@ -2,6 +2,7 @@ package cn.ac.iie.handler;
 
 import cn.ac.iie.entity.Project;
 import cn.ac.iie.entity.Repository;
+import cn.ac.iie.proxy.result.Result;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface RegistryHandler {
      *
      * @return
      */
-    List<Project> listProjects();
+    Result<List<Project>> listProjects();
 
     /**
      * /repositories    Get repositories accompany with relevant project and repo name.
@@ -23,7 +24,7 @@ public interface RegistryHandler {
      * @param projectId
      * @return
      */
-    List<Repository> listRepostories(String projectId);
+    Result<List<Repository>> listRepostories(String projectId);
 
     /**
      * /repositories/{repo_name}    Delete a repository.
@@ -31,7 +32,7 @@ public interface RegistryHandler {
      * @param repositoryName
      * @return
      */
-    int deleteRepository(String repositoryName);
+    Result<Integer> deleteRepository(String repositoryName);
 
     /**
      * /repositories/{repo_name}/tags/{tag} Delete a tag in a repository.
@@ -40,7 +41,7 @@ public interface RegistryHandler {
      * @param tag
      * @return
      */
-    int deleteRepository(String repo_name, String tag);
+    Result<Integer> deleteRepository(String repo_name, String tag);
 
     /**
      * /repositories/{repo_name}/tags   Get tags of a relevant repository.
@@ -48,7 +49,7 @@ public interface RegistryHandler {
      * @param repositoryName
      * @return
      */
-    List<String> listTagsOfRepository(String repositoryName);
+    Result<List<String>> listTagsOfRepository(String repositoryName);
 
 
 }

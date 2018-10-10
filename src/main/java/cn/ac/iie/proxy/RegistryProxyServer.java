@@ -2,8 +2,6 @@ package cn.ac.iie.proxy;
 
 import cn.ac.iie.di.commons.httpserver.framework.server.HttpServer;
 import cn.ac.iie.proxy.controller.HelloController;
-import cn.ac.iie.proxy.controller.ImageController;
-import cn.ac.iie.proxy.controller.RegistryController;
 import org.apache.log4j.Logger;
 
 /**
@@ -24,14 +22,14 @@ public class RegistryProxyServer {
     public void start() throws Exception {
         server.registerContextHandler("/", "hello", HelloController::new);
         server.registerContextHandler("/", "hello/", HelloController::new);
-
+/*
         server.registerContextHandler(IMAGE_ROOT_CONTEXT_URI, "image", ImageController::new);
         server.registerContextHandler(IMAGE_ROOT_CONTEXT_URI, "image/", ImageController::new);
 
         server.registerContextHandler(REGISTRY_ROOT_CONTEXT_URI, "registry", RegistryController::new);
-        server.registerContextHandler(REGISTRY_ROOT_CONTEXT_URI, "registry/", RegistryController::new);
+        server.registerContextHandler(REGISTRY_ROOT_CONTEXT_URI, "registry/", RegistryController::new);*/
 
-        server.startup();
+//        server.startup();
     }
 
     public void stop() throws Exception {

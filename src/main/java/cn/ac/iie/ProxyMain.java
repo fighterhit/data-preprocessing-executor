@@ -1,7 +1,5 @@
 package cn.ac.iie;
 
-import cn.ac.iie.common.Constants;
-import cn.ac.iie.handler.Impl.KillHandlerImpl;
 import cn.ac.iie.proxy.RegistryProxyServer;
 import org.apache.commons.configuration2.FileBasedConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
@@ -12,10 +10,13 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * @author Fighter Created on 2018/9/26.
  */
+@SpringBootApplication
 public class ProxyMain {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProxyMain.class);
@@ -39,12 +40,12 @@ public class ProxyMain {
             System.exit(1);
         }
 
-        try {
+        /*try {
             service = new RegistryProxyServer(conf.getInt(Constants.JETTY_SERVER_PORT), conf.getInt(Constants.JETTY_SERVER_PARALLEL));
         } catch (Exception e) {
             LOGGER.error("jetty server start error: {}", e);
             System.exit(1);
-        }
+        }*/
     }
 
     private static FileBasedConfiguration initConfiguration() throws ConfigurationException {
@@ -62,11 +63,11 @@ public class ProxyMain {
     public static void main(String[] args) {
         try {
             //先注册java虚拟机关闭钩子,程序退出/System.exit()/crtl+c/系统关闭/OOM/kill pid
-            new KillHandlerImpl(service).startShutdownHook();
+//            new KillHandlerImpl(service).startShutdownHook();
 
 
             //启动代理服务
-
+            SpringApplication.run(ProxyMain.class, args);
 
             LOGGER.info("registry service start success...");
         } catch (Exception e) {

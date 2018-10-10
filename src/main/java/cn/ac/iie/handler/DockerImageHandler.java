@@ -1,22 +1,23 @@
 package cn.ac.iie.handler;
 
+import cn.ac.iie.proxy.result.Result;
 import com.github.dockerjava.api.model.Image;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Fighter Created on 2018/9/26.
  */
 public interface DockerImageHandler {
-    Map<String, String> load(String imagePath);
+    Result<Integer> load(String imagePath);
 
-    void tag(String oldImageNameAndTag, String newImageName, String newTag);
+    Result<Integer> tag(String oldImageNameAndTag, String newImageName, String newTag);
 
-    void push(String imageNameAndTag);
+    Result<Integer> push(String imageNameAndTag);
 
-    void pull(String imageNameAndTag);
+    Result<Integer> pull(String imageNameAndTag);
 
-    List<Image> getImages();
+    Result<List<Image>> getImages();
 
+    Result<Integer> removeImage(String imageNameAndTag);
 }
