@@ -42,7 +42,7 @@ public class ProxyMain {
         try {
             service = new RegistryProxyServer(conf.getInt(Constants.JETTY_SERVER_PORT), conf.getInt(Constants.JETTY_SERVER_PARALLEL));
         } catch (Exception e) {
-            LOGGER.error("jetty server start error: {}", e);
+            LOGGER.error("jetty server start error: {}", ExceptionUtils.getFullStackTrace(e));
             System.exit(1);
         }
     }
@@ -66,7 +66,7 @@ public class ProxyMain {
 
 
             //启动代理服务
-
+            service.start();
 
             LOGGER.info("registry service start success...");
         } catch (Exception e) {

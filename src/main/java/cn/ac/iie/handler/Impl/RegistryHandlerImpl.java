@@ -10,6 +10,7 @@ import cn.ac.iie.handler.RegistryHandler;
 import cn.ac.iie.util.HttpClientUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.client.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,7 @@ public class RegistryHandlerImpl implements RegistryHandler {
             JSONArray jsonArray = JSON.parseArray(result.getContent());
             repositories = jsonArray.toJavaList(Repository.class);
         } catch (Exception e) {
-            LOGGER.error("list repostories error! {}", e);
+            LOGGER.error("list repostories error! {}", ExceptionUtils.getFullStackTrace(e));
         }
         return repositories;
     }

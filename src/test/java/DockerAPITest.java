@@ -5,11 +5,15 @@ import com.github.dockerjava.api.model.AuthConfig;
 import com.github.dockerjava.api.model.Image;
 import com.github.dockerjava.api.model.PullResponseItem;
 import com.github.dockerjava.api.model.PushResponseItem;
+import com.github.dockerjava.core.command.BuildImageResultCallback;
 import com.github.dockerjava.core.command.PullImageResultCallback;
 import com.github.dockerjava.core.command.PushImageResultCallback;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +27,20 @@ public class DockerAPITest {
             .withUsername("admin")
             .withPassword("Harbor12345")
             .withRegistryAddress("http://192.168.11.112/v2/");
+
+    @Test
+    void testBuild() {
+        dockerClient.buildImageCmd()
+                .withBaseDirectory(null)
+                .withDockerfile(null)
+                .exec(new MyBuildImageResultCallback())
+                .awaitImageId();
+    }
+
+    class MyBuildImageResultCallback extends BuildImageResultCallback {
+
+
+    }
 
     @Test
     void testLoad() {
