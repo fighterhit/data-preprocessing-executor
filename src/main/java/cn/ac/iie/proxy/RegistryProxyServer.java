@@ -1,5 +1,7 @@
 package cn.ac.iie.proxy;
 
+import cn.ac.iie.ProxyMain;
+import cn.ac.iie.common.Constants;
 import cn.ac.iie.di.commons.httpserver.framework.server.HttpServer;
 import cn.ac.iie.proxy.controller.HelloController;
 import cn.ac.iie.proxy.controller.PushImageController;
@@ -11,8 +13,8 @@ import org.apache.log4j.Logger;
  * @author Fighter Created on 2018/9/26.
  */
 public class RegistryProxyServer {
-    private static final String IMAGE_ROOT_CONTEXT_URI = "/";
-    private static final String REGISTRY_ROOT_CONTEXT_URI = "/registry";
+    private static final String IMAGE_ROOT_CONTEXT_URI = ProxyMain.conf.getString(Constants.JETTY_SERVER_IMAGE_ROOT_CONTEXT_URI);
+    private static final String REGISTRY_ROOT_CONTEXT_URI = ProxyMain.conf.getString(Constants.JETTY_SERVER_REGISTRY_ROOT_CONTEXT_URI);
     private static final Logger LOGGER = Logger.getLogger(RegistryProxyServer.class);
     HttpServer server;
 
@@ -21,9 +23,9 @@ public class RegistryProxyServer {
     }
 
     public void start() throws Exception {
-        server.registerContext(IMAGE_ROOT_CONTEXT_URI);
-        server.registerContextHandler("/", "hello", HelloController::new);
-        server.registerContextHandler("/", "hello/", HelloController::new);
+        server.registerContext("/");
+        server.registerContextHandler(IMAGE_ROOT_CONTEXT_URI, "hello", HelloController::new);
+        server.registerContextHandler(REGISTRY_ROOT_CONTEXT_URI, "hello/", HelloController::new);
 
         server.registerContextHandler(IMAGE_ROOT_CONTEXT_URI, "push", PushImageController::new);
         server.registerContextHandler(IMAGE_ROOT_CONTEXT_URI, "push/", PushImageController::new);

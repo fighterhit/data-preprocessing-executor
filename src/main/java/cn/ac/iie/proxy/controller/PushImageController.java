@@ -43,9 +43,10 @@ public class PushImageController implements HandlerI {
                 //检查文件
                 if (files.size() > 0 && files.size() == path.size()) {
                     if (existFiles(desDir, path, files)) {
+                        //先load
+                        dockerImageHandler.load(imagePath);
                         String dockerFilePath = null;
                         build(dockerFilePath);
-
 
                     } else {
                         response.sendError(HttpServletResponse.SC_NO_CONTENT, "verify error");
@@ -63,6 +64,7 @@ public class PushImageController implements HandlerI {
     }
 
     private void build(String dockerFilePath) {
+
 
     }
 

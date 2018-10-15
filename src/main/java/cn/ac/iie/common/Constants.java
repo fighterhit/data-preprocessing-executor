@@ -18,4 +18,6 @@ public interface Constants {
     String HTTP_HEADER_AUTHORIZATION = "http.header.authorization";
     String JETTY_SERVER_PORT = "jetty.server.port";
     String JETTY_SERVER_PARALLEL = "jetty.server.parallel";
+    String JETTY_SERVER_IMAGE_ROOT_CONTEXT_URI = "jetty.server.image.root.context.uri";
+    String JETTY_SERVER_REGISTRY_ROOT_CONTEXT_URI = "jetty.server.registry.root.context.uri";
 }
