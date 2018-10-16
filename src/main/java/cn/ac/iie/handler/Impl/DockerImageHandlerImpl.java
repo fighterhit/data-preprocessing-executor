@@ -4,10 +4,8 @@ import cn.ac.iie.ProxyMain;
 import cn.ac.iie.common.Constants;
 import cn.ac.iie.handler.DockerImageHandler;
 import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.model.AuthConfig;
-import com.github.dockerjava.api.model.Image;
-import com.github.dockerjava.api.model.PullResponseItem;
-import com.github.dockerjava.api.model.PushResponseItem;
+import com.github.dockerjava.api.model.*;
+import com.github.dockerjava.core.command.BuildImageResultCallback;
 import com.github.dockerjava.core.command.PullImageResultCallback;
 import com.github.dockerjava.core.command.PushImageResultCallback;
 import org.slf4j.Logger;
@@ -17,9 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Fighter Created on 2018/9/27.
@@ -109,6 +105,7 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
 
     /**
      * get all the images from the remote docker engine
+     *
      * @return
      */
     @Override
@@ -120,6 +117,25 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
             LOGGER.error("get images error! {}", e);
         }
         return images;
+    }
+
+    public String build(String dockerFile) {
+        return dockerClient.buildImageCmd()
+                .withDockerfile(new File(dockerFile))
+                .exec(new MyBuildImageResultCallback())
+                .awaitImageId();
+    }
+
+    class MyBuildImageResultCallback extends BuildImageResultCallback {
+        @Override
+        public void onNext(BuildResponseItem item) {
+            super.onNext(item);
+        }
+
+        @Override
+        public void onComplete() {
+            super.onComplete();
+        }
     }
 
     class MyPushImageResultCallback extends PushImageResultCallback {

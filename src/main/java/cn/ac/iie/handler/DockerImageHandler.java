@@ -19,4 +19,5 @@ public interface DockerImageHandler {
 
     List<Image> getImages();
 
+    String build(String dockerFile);
 }
