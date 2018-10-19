@@ -2,10 +2,10 @@ package cn.ac.iie.proxy.controller;
 
 import cn.ac.iie.common.DockerConfig;
 import cn.ac.iie.di.commons.httpserver.framework.handler.HandlerI;
-import cn.ac.iie.entity.VerifyJson;
 import cn.ac.iie.handler.DockerImageHandler;
 import cn.ac.iie.handler.Impl.DockerImageHandlerImpl;
 import cn.ac.iie.util.UnCompressUtils;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -37,19 +37,16 @@ public class PushImageController implements HandlerI {
     @Override
     public void execute(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws Exception {
         try {
-
-            String reqJson = request.getParameter("q");
-            VerifyJson verifyJson = JSONObject.parseObject(reqJson, VerifyJson.class);
-            String imagePath = verifyJson.getImagePath();
-            List<String> path = verifyJson.getPath();
-            List<List<String>> files = verifyJson.getFiles();
-
+            Map<String, String[]> paramMap = request.getParameterMap();
+            String imagePath = paramMap.get("imagePath")[0];
+            String check = paramMap.get("check")[0];
+            JSONObject jsonObject = JSON.parseObject(check);
             Map<String, String> map = new HashMap<>();
             //解压，创建解压文件夹
             unCompressImageTar(imagePath, map);
             String desDir = map.get("desDir");
-            //校验路径是否存在
-            if (path.size() > 0 && existFiles(desDir, path, files)) {
+            //todo 校验路径是否存在
+            if (!jsonObject.isEmpty() && existFiles(desDir, jsonObject)) {
                 //先load
                 dockerImageHandler.load(imagePath);
                 String dockerFilePath = null;
@@ -58,6 +55,7 @@ public class PushImageController implements HandlerI {
                 response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, "verify error!");
             }
         } catch (Exception e) {
+            System.out.println(ExceptionUtils.getFullStackTrace(e));
             LOGGER.error("server error! {}", ExceptionUtils.getFullStackTrace(e));
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "request failed.");
         }
@@ -93,13 +91,14 @@ public class PushImageController implements HandlerI {
     }
 
     //检查文件是否存在
-    private boolean existFiles(String desDir, List<String> paths, List<List<String>> fileListArr) {
-        for (int i = 0; i < paths.size(); i++) {
-            if (!Files.isDirectory(Paths.get(desDir + paths.get(i)))) {
+    private boolean existFiles(String desDir, JSONObject jsonObject) {
+        for (String checkPath : jsonObject.keySet()) {
+            File path = new File(checkPath);
+            if (!Files.isDirectory(Paths.get(desDir + path))) {
                 return false;
             }
-            String preFix = desDir + paths.get(i);
-            List<String> files = fileListArr.get(i);
+            String preFix = desDir + path;
+            List<String> files = jsonObject.getJSONArray(checkPath).toJavaList(String.class);
             for (String file : files) {
                 if (Files.exists(Paths.get(preFix + file))) {
                     return false;

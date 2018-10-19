@@ -24,11 +24,11 @@ public class RegistryProxyServer {
 
     public void start() throws Exception {
         server.registerContext("/");
-        server.registerContextHandler(IMAGE_ROOT_CONTEXT_URI, "hello", HelloController::new);
-        server.registerContextHandler(REGISTRY_ROOT_CONTEXT_URI, "hello/", HelloController::new);
+        server.registerContextHandler(IMAGE_ROOT_CONTEXT_URI, "/hello", HelloController::new);
+        server.registerContextHandler(REGISTRY_ROOT_CONTEXT_URI, "/hello/", HelloController::new);
 
-        server.registerContextHandler(IMAGE_ROOT_CONTEXT_URI, "push", PushImageController::new);
-        server.registerContextHandler(IMAGE_ROOT_CONTEXT_URI, "push/", PushImageController::new);
+        server.registerContextHandler(IMAGE_ROOT_CONTEXT_URI, "/push", PushImageController::new);
+        server.registerContextHandler(IMAGE_ROOT_CONTEXT_URI, "/push/", PushImageController::new);
 
 //        server.registerContextHandler(REGISTRY_ROOT_CONTEXT_URI, "registry", RegistryController::new);
 //        server.registerContextHandler(REGISTRY_ROOT_CONTEXT_URI, "registry/", RegistryController::new);
