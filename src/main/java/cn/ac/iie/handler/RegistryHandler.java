@@ -1,5 +1,6 @@
 package cn.ac.iie.handler;
 
+import cn.ac.iie.entity.HttpClientResult;
 import cn.ac.iie.entity.Project;
 import cn.ac.iie.entity.Repository;
 
@@ -31,7 +32,7 @@ public interface RegistryHandler {
      * @param repositoryName
      * @return
      */
-    int deleteRepository(String repositoryName);
+    HttpClientResult deleteRepository(String repositoryName);
 
     /**
      * /repositories/{repo_name}/tags/{tag} Delete a tag in a repository.
@@ -40,7 +41,7 @@ public interface RegistryHandler {
      * @param tag
      * @return
      */
-    int deleteRepository(String repo_name, String tag);
+    HttpClientResult deleteRepository(String repo_name, String tag);
 
     /**
      * /repositories/{repo_name}/tags   Get tags of a relevant repository.

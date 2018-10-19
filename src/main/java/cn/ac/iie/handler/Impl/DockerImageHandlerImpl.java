@@ -119,10 +119,18 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
         return images;
     }
 
+    @Override
     public String build(String dockerFile) {
         return dockerClient.buildImageCmd()
                 .withDockerfile(new File(dockerFile))
-//                .withTags()
+                .exec(new MyBuildImageResultCallback())
+                .awaitImageId();
+    }
+
+    public String build(String dockerFile, String imageNameAndTag) {
+        return dockerClient.buildImageCmd()
+                .withDockerfile(new File(dockerFile))
+                .withTags(new HashSet<>(Arrays.asList(imageNameAndTag)))
                 .exec(new MyBuildImageResultCallback())
                 .awaitImageId();
     }

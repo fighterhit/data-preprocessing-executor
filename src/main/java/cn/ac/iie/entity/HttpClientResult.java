@@ -1,5 +1,7 @@
 package cn.ac.iie.entity;
 
+import com.alibaba.fastjson.JSON;
+
 import java.io.Serializable;
 
 /**
@@ -53,7 +55,7 @@ public class HttpClientResult implements Serializable {
 
     @Override
     public String toString() {
-        return "HttpClientResult [code=" + code + ", content=" + content + "]";
+        return JSON.toJSONString(this);
     }
 
 }

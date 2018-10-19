@@ -16,10 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -34,6 +31,8 @@ public class PushImageController implements HandlerI {
     private static final Logger LOGGER = LoggerFactory.getLogger(PushImageController.class);
     private DockerImageHandler dockerImageHandler = new DockerImageHandlerImpl(DockerConfig.getDockerClient());
 
+    //imagePath:url_test
+    //check:{"path1":["path1File1","path1File2"],"path2":["path2File1","path2File2"]}
     @Override
     public void execute(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws Exception {
         try {
@@ -43,6 +42,7 @@ public class PushImageController implements HandlerI {
             JSONObject jsonObject = JSON.parseObject(check);
             Map<String, String> map = new HashMap<>();
             //解压，创建解压文件夹
+//            unCompressImageTar(imagePath, map);
             unCompressImageTar(imagePath, map);
             String desDir = map.get("desDir");
             //todo 校验路径是否存在
@@ -50,19 +50,30 @@ public class PushImageController implements HandlerI {
                 //先load
                 dockerImageHandler.load(imagePath);
                 String dockerFilePath = null;
-                String imageID = build(dockerFilePath);
+                String imageID = build(dockerFilePath, map.get("RepoTags"));
+
             } else {
                 response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, "verify error!");
             }
         } catch (Exception e) {
-            System.out.println(ExceptionUtils.getFullStackTrace(e));
             LOGGER.error("server error! {}", ExceptionUtils.getFullStackTrace(e));
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "request failed.");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "server error.");
         }
     }
 
-    private String build(String dockerFilePath) {
-        return dockerImageHandler.build(dockerFilePath);
+    private String build(String dockerFilePath, String imageNameAndTag) throws IOException {
+        //修改Dockerfile模板
+        List<String> lines = Files.readAllLines(Paths.get(dockerFilePath));
+        for (String line : lines) {
+            if (line.startsWith("FROM")) {
+                line.replaceFirst("(?<=FROM )(.*)", imageNameAndTag);
+                break;
+            }
+        }
+
+        //修改模板文件，fixme 修改写文件路径
+        IOUtils.writeLines(lines, IOUtils.LINE_SEPARATOR, new FileWriter(dockerFilePath));
+        return dockerImageHandler.build(dockerFilePath, imageNameAndTag);
     }
 
     //返回压缩文件目录、镜像名:标签

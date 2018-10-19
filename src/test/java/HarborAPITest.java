@@ -95,7 +95,7 @@ public class HarborAPITest {
     }
 
     @Test
-    void deleteRepository(Tag tag){
+    void deleteRepositoryTag(){
         int retCode = -1;
         HttpClientResult result;
         try {
@@ -104,9 +104,9 @@ public class HarborAPITest {
             headers.put("authorization", "Basic YWRtaW46SGFyYm9yMTIzNDU=");
             String reqUrl = new StringBuffer(harborBaseAPI)
                     .append("/repositories/")
-                    .append("hlg_web/busybox")
+                    .append("hlg_web/docker-java/load")
                     .append("/tags/")
-                    .append("harbortest")
+                    .append("1.0")
                     .toString();
             result = HttpClientUtils.doDelete(reqUrl, headers);
             System.out.println(result.getCode());

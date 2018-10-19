@@ -96,7 +96,6 @@ public class ProxyMain {
 
             LOGGER.info("registry service start success...");
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             LOGGER.error("registry service start failed! {}", ExceptionUtils.getFullStackTrace(e));
         }
 

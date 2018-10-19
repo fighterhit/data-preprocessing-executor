@@ -11,7 +11,6 @@ import cn.ac.iie.util.HttpClientUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.http.client.HttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +28,14 @@ public class RegistryHandlerImpl implements RegistryHandler {
     private String authorization;
     private String harborBaseAPI;
 
-    public RegistryHandlerImpl(HttpClient client) {
+    private String registryRepoName;
+    private String registryProjectName;
+
+    public RegistryHandlerImpl() {
         harborBaseAPI = ProxyMain.conf.getString(Constants.HARBOR_BASEAPI);
         authorization = ProxyMain.conf.getString(Constants.HTTP_HEADER_AUTHORIZATION);
+        registryRepoName = ProxyMain.conf.getString(Constants.REGISTRY_REPO_NAME);
+        registryProjectName = ProxyMain.conf.getString(Constants.REGISTRY_PROJECT_NAME);
     }
 
     @Override
@@ -71,9 +75,9 @@ public class RegistryHandlerImpl implements RegistryHandler {
     }
 
     @Override
-    public int deleteRepository(String repositoryName) {
+    public HttpClientResult deleteRepository(String repositoryName) {
         int retCode = -1;
-        HttpClientResult result;
+        HttpClientResult result = null;
         try {
             Map<String, String> headers = new HashMap<>();
             headers.put("accept", "application/json");
@@ -83,33 +87,33 @@ public class RegistryHandlerImpl implements RegistryHandler {
                     .append(repositoryName)
                     .toString();
             result = HttpClientUtils.doDelete(reqUrl, headers);
-            retCode = result.getCode();
         } catch (Exception e) {
             LOGGER.error("delete repository error! {}", e);
         }
-        return retCode;
+        return result;
     }
 
     @Override
-    public int deleteRepository(String repositoryName, String tag) {
+    public HttpClientResult deleteRepository(String repositoryName, String tag) {
         int retCode = -1;
-        HttpClientResult result;
+        HttpClientResult result = null;
         try {
             Map<String, String> headers = new HashMap<>();
             headers.put("accept", "application/json");
             headers.put("authorization", "Basic YWRtaW46SGFyYm9yMTIzNDU=");
             String reqUrl = new StringBuffer(harborBaseAPI)
                     .append("/repositories/")
+                    .append(registryProjectName)
+                    .append("/")
                     .append(repositoryName)
                     .append("/tags/")
                     .append(tag)
                     .toString();
             result = HttpClientUtils.doDelete(reqUrl, headers);
-            retCode = result.getCode();
         } catch (Exception e) {
             LOGGER.error("delete repository error! {}", e);
         }
-        return retCode;
+        return result;
     }
 
     @Override

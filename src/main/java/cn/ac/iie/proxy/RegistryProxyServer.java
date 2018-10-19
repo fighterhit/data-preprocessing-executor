@@ -3,6 +3,8 @@ package cn.ac.iie.proxy;
 import cn.ac.iie.ProxyMain;
 import cn.ac.iie.common.Constants;
 import cn.ac.iie.di.commons.httpserver.framework.server.HttpServer;
+import cn.ac.iie.di.dpp.k8s.controller.*;
+import cn.ac.iie.proxy.controller.DeleteImageController;
 import cn.ac.iie.proxy.controller.HelloController;
 import cn.ac.iie.proxy.controller.PushImageController;
 import org.apache.log4j.Logger;
@@ -26,12 +28,20 @@ public class RegistryProxyServer {
 
     public void start() throws Exception {
         server.registerContext("/");
+
         server.registerContextHandler(IMAGE_ROOT_CONTEXT_URI, "hello", HelloController::new);
         server.registerContextHandler(REGISTRY_ROOT_CONTEXT_URI, "hello/", HelloController::new);
 
-        server.registerContextHandler(IMAGE_ROOT_CONTEXT_URI, "push", PushImageController::new);
-        server.registerContextHandler(IMAGE_ROOT_CONTEXT_URI, "push/", PushImageController::new);
+        //上传镜像
+        server.registerContextHandler(IMAGE_ROOT_CONTEXT_URI, "/push", PushImageController::new);
+        server.registerContextHandler(IMAGE_ROOT_CONTEXT_URI, "/push/", PushImageController::new);
 
+        //查询镜像
+        server.registerContextHandler(REGISTRY_ROOT_CONTEXT_URI, "/delete", DeleteImageController::new);
+        server.registerContextHandler(REGISTRY_ROOT_CONTEXT_URI, "/delete/", DeleteImageController::new);
+
+
+        //k8s
         server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/createNamespace", CreateNamespace::new);
         server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/createNamespace/", CreateNamespace::new);
 
@@ -49,8 +59,6 @@ public class RegistryProxyServer {
 
         server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/replaceDeployment", ReplaceDeployment::new);
         server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/replaceDeployment/", ReplaceDeployment::new);
-//        server.registerContextHandler(REGISTRY_ROOT_CONTEXT_URI, "registry", RegistryController::new);
-//        server.registerContextHandler(REGISTRY_ROOT_CONTEXT_URI, "registry/", RegistryController::new);
 
         server.startup();
     }

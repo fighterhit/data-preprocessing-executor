@@ -20,4 +20,6 @@ public interface DockerImageHandler {
     List<Image> getImages();
 
     String build(String dockerFile);
+
+    String build(String dockerFile, String imageNameAndTag);
 }
