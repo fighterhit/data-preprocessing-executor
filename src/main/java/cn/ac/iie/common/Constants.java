@@ -20,4 +20,8 @@ public interface Constants {
     String JETTY_SERVER_PARALLEL = "jetty.server.parallel";
     String JETTY_SERVER_IMAGE_ROOT_CONTEXT_URI = "jetty.server.image.root.context.uri";
     String JETTY_SERVER_REGISTRY_ROOT_CONTEXT_URI = "jetty.server.registry.root.context.uri";
+    String JETTY_SERVER_K8S_ROOT_CONTEXT_URI = "jetty.server.k8s.root.context.uri";
+    String K8S_MASTER = "k8s.master";
+    String K8S_USERNAME = "k8s.username";
+    String K8S_PASSWORD = "k8s.password";
 }

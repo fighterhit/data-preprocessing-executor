@@ -1,4 +1,4 @@
-import FTPTest.FtpUtils;
+
 import cn.ac.iie.common.DockerConfig;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.model.AuthConfig;
@@ -45,10 +45,10 @@ public class DockerAPITest {
     @Test
     void testLoad() {
         try {
-            FtpUtils ftp = new FtpUtils();
-            //没反应
-            InputStream uploadStream = ftp.ftpClient.retrieveFileStream("image_1.0.tar");
-            dockerClient.loadImageCmd(uploadStream).exec();
+//            FtpUtils ftp = new FtpUtils();
+//            //没反应
+//            InputStream uploadStream = ftp.ftpClient.retrieveFileStream("image_1.0.tar");
+//            dockerClient.loadImageCmd(uploadStream).exec();
 //            ftp.downFile("thinkphp_5.0.10_full.zip","thinkphp_5.0.10_full.zip");
 //            ftp.downFile("image_1.0.tar","image_1.0.tar");
 //            ftp.ftpClient.retrieveFile("test.txt",new FileOutputStream("test.txt"));
