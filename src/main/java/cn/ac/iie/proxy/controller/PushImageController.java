@@ -1,5 +1,7 @@
 package cn.ac.iie.proxy.controller;
 
+import cn.ac.iie.ProxyMain;
+import cn.ac.iie.common.Constants;
 import cn.ac.iie.common.DockerConfig;
 import cn.ac.iie.di.commons.httpserver.framework.handler.HandlerI;
 import cn.ac.iie.handler.DockerImageHandler;
@@ -10,7 +12,6 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.eclipse.jetty.server.Request;
-import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +51,14 @@ public class PushImageController implements HandlerI {
                 //先load
                 dockerImageHandler.load(imagePath);
                 String dockerFilePath = null;
-                String imageID = build(dockerFilePath, map.get("RepoTags"));
-
+                String imageName = map.get("RepoTags").split(":")[0];
+                String tag = map.get("RepoTags").split(":")[1];
+                String buildImageAndTag = imageName + "_:" + tag;
+                String imageID = build(dockerFilePath, buildImageAndTag);
+                //tag
+                String pushImageAndTag = getPushTag(buildImageAndTag);
+                //push
+                dockerImageHandler.push(pushImageAndTag);
             } else {
                 response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, "verify error!");
             }
@@ -59,6 +66,18 @@ public class PushImageController implements HandlerI {
             LOGGER.error("server error! {}", ExceptionUtils.getFullStackTrace(e));
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "server error.");
         }
+    }
+
+    private String getPushTag(String buildImageAndTag) {
+        String oldImage = buildImageAndTag.split(":")[0];
+        String tag = buildImageAndTag.split(":")[1];
+        String newImageName = new StringBuffer(ProxyMain.conf.getString(Constants.REGISTRY_REPO_NAME))
+                .append("/")
+                .append(ProxyMain.conf.getString(Constants.REGISTRY_PROJECT_NAME))
+                .append("/")
+                .append(oldImage).toString();
+        dockerImageHandler.tag(buildImageAndTag, newImageName, tag);
+        return newImageName + ":" + tag;
     }
 
     private String build(String dockerFilePath, String imageNameAndTag) throws IOException {
@@ -89,7 +108,7 @@ public class PushImageController implements HandlerI {
         }
     }
 
-    @Test
+    //    @Test
     private void getRepoTags(String desDir, Map<String, String> map) throws IOException {
         //读取压缩文件目录内的 manifest.json
         InputStream inputStream = new FileInputStream(desDir + File.separator + "manifest.json");
