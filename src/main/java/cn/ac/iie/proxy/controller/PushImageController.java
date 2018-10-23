@@ -54,6 +54,7 @@ public class PushImageController implements HandlerI {
                 String imageName = map.get("RepoTags").split(":")[0];
                 String tag = map.get("RepoTags").split(":")[1];
                 String buildImageAndTag = imageName + "_:" + tag;
+                //build：修改dockerfile模板后build
                 String imageID = build(dockerFilePath, buildImageAndTag);
                 //tag
                 String pushImageAndTag = getPushTag(buildImageAndTag);
@@ -102,6 +103,7 @@ public class PushImageController implements HandlerI {
         try {
             UnCompressUtils.unTar(new File(imagePath), desDir);
             map.put("desDir", desDir);
+            getRepoTags(desDir, map);
         } catch (Exception e) {
             LOGGER.error("uncompress error! {}", ExceptionUtils.getFullStackTrace(e));
             throw new Exception(e);
@@ -122,15 +124,16 @@ public class PushImageController implements HandlerI {
 
     //检查文件是否存在
     private boolean existFiles(String desDir, JSONObject jsonObject) {
+        //先检查路径是否存在
         for (String checkPath : jsonObject.keySet()) {
-            File path = new File(checkPath);
-            if (!Files.isDirectory(Paths.get(desDir + path))) {
+            if (!Files.isDirectory(Paths.get(desDir + checkPath))) {
                 return false;
             }
-            String preFix = desDir + path;
+            String preFix = desDir + checkPath;
             List<String> files = jsonObject.getJSONArray(checkPath).toJavaList(String.class);
+            //检查路径下文件是否存在
             for (String file : files) {
-                if (Files.exists(Paths.get(preFix + file))) {
+                if (!Files.exists(Paths.get(preFix + File.separator + file))) {
                     return false;
                 }
             }
