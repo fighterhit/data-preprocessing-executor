@@ -14,9 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Fighter Created on 2018/9/30.
@@ -31,8 +29,9 @@ public class DockerAPITest {
     @Test
     void testBuild() {
         dockerClient.buildImageCmd()
-                .withBaseDirectory(null)
-                .withDockerfile(null)
+//                .withBaseDirectory(null)
+//                .withDockerfile(new File("/root/IdeaProjects/docker-registry-proxy/src/main/resources/Dockerfile.properties"))
+                .withTags(new HashSet<>(Arrays.asList("docker-java/load/1.0")))
                 .exec(new MyBuildImageResultCallback())
                 .awaitImageId();
     }

@@ -129,6 +129,7 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
 
     public String build(String dockerFile, String imageNameAndTag) {
         return dockerClient.buildImageCmd()
+                .withNoCache(true)
                 .withDockerfile(new File(dockerFile))
                 .withTags(new HashSet<>(Arrays.asList(imageNameAndTag)))
                 .exec(new MyBuildImageResultCallback())

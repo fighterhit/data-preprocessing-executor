@@ -63,7 +63,7 @@ public class DockerDemo {
         /*System.out.println("----------------------- build an image ------------------------");
         String imageId = dockerClient.buildImageCmd()
                 //写完全的Dockerfile路径
-                .withDockerfile(new File("C:\\Users\\Limyiter\\Documents\\k8s\\hw\\hello-world-server\\Dockerfile"))
+                .withDockerfile(new File("C:\\Users\\Limyiter\\Documents\\k8s\\hw\\hello-world-server\\Dockerfile.properties"))
                 .withPull(true)
                 .withNoCache(true)
                 //对应 docker images 后的 REPOSITORY:TAG

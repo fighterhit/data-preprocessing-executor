@@ -32,10 +32,11 @@ public class PushImageController implements HandlerI {
     private static final Logger LOGGER = LoggerFactory.getLogger(PushImageController.class);
     private DockerImageHandler dockerImageHandler = new DockerImageHandlerImpl(DockerConfig.getDockerClient());
 
-    private static final String DockerfilePath;
+    //    private static String DockerfilePath ;
+    private static final String Dockerfilepath;
 
     static {
-        DockerfilePath = ClassLoader.getSystemClassLoader().getResource("configuration.properties").getFile();
+        Dockerfilepath = ClassLoader.getSystemClassLoader().getResource("Dockerfile.properties").getFile();
     }
 
     //imagePath:url_test
@@ -52,13 +53,13 @@ public class PushImageController implements HandlerI {
             unCompressImageTar(imagePath, map);
             String desDir = map.get("desDir");
             //todo 校验路径是否存在
-            if (!jsonObject.isEmpty() && existFiles(desDir, jsonObject)) {
+//            if (!jsonObject.isEmpty() && existFiles(desDir, jsonObject)) {
+            if (true) {
                 //先load
                 dockerImageHandler.load(imagePath);
                 //build：修改dockerfile模板后build
                 build(map);
                 //tag
-//                String pushImageAndTag = getPushTag(buildImageAndTag);
                 String pushImageAndTag = getPushTag(map);
                 //push
                 dockerImageHandler.push(pushImageAndTag);
@@ -76,7 +77,7 @@ public class PushImageController implements HandlerI {
     }
 
     private String getPushTag(Map<String, String> map) {
-        String buildImageAndTag = map.get("");
+        String buildImageAndTag = map.get("buildImageAndTag");
         String oldImage = buildImageAndTag.split(":")[0];
         String tag = buildImageAndTag.split(":")[1];
         String newImageName = new StringBuffer(ProxyMain.conf.getString(Constants.REGISTRY_REPO_NAME))
@@ -91,30 +92,34 @@ public class PushImageController implements HandlerI {
     private void build(Map<String, String> map) throws Exception {
         try {
             //新tag名为：oldImageName_:oldTag
-            String[] repoTags = map.get("RepoTags").split(":");
+            String oldImageNameTag = map.get("RepoTags");
+            String[] repoTags = oldImageNameTag.split(":");
             String imageName = repoTags[0];
             String tag = repoTags[1];
-            String buildImageAndTag = imageName + "_:" + tag;
+            String buildImageAndTag = imageName + "_iie:" + tag;
 
             //修改Dockerfile模板，复制一份到解压文件中
             String desDir = map.get("desDir");
             String buildDockerfilePath = desDir + File.separator + "Dockerfile";
-            int ret = IOUtils.copy(new FileInputStream(DockerfilePath), new FileOutputStream(buildDockerfilePath));
+            int ret = IOUtils.copy(new FileInputStream(Dockerfilepath), new FileOutputStream(buildDockerfilePath));
             if (ret < 0) {
-                throw new Exception("copy Dockerfile template error!");
+                throw new Exception("copy Dockerfile.properties template error!");
             }
-
+//
             List<String> lines = Files.readAllLines(Paths.get(buildDockerfilePath));
-            for (String line : lines) {
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
                 if (line.startsWith("FROM")) {
-                    line.replaceFirst("(?<=FROM )(.*)", buildImageAndTag);
+                    lines.set(i, line.replaceFirst("(?<=FROM )(.*)", oldImageNameTag));
                     break;
                 }
             }
             //修改模板副本文件
-            IOUtils.writeLines(lines, IOUtils.LINE_SEPARATOR, new FileWriter(buildDockerfilePath));
+            IOUtils.writeLines(lines, IOUtils.LINE_SEPARATOR, new FileOutputStream(buildDockerfilePath));
+//            IOUtils.writeLines(lines, IOUtils.LINE_SEPARATOR, new FileWriter(buildDockerfilePath));
             String imageID = dockerImageHandler.build(buildDockerfilePath, buildImageAndTag);
             map.put("imageID", imageID);
+            map.put("buildImageAndTag", buildImageAndTag);
         } catch (Exception e) {
             LOGGER.error("build error! {}", ExceptionUtils.getFullStackTrace(e));
             throw e;
