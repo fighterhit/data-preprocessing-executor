@@ -33,7 +33,7 @@ public class DeleteNamespace implements HandlerI {
 
             String namespaceName = paramterMap.get("namespaceName")[0];
             k8sUtil.DeleteNameSpace(api, namespaceName);
-            String answer = new StringBuilder().append("0").append("\n").append(namespaceName).toString();
+            String answer = new StringBuilder().append(namespaceName).toString();
             response.getWriter().print(answer);
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().flush();

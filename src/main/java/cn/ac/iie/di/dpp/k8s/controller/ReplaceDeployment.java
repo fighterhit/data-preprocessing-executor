@@ -70,7 +70,7 @@ public class ReplaceDeployment implements HandlerI {
                     namespaceName, replicaRequest, replicaLimit, podcpuThreshold, podmemoryThreshold);
             LOGGER.info("HorizontalPodAutoscaler " + myHPA.getMetadata().getName() + " is replaced.\n" + myHPA);
 
-            String answer = new StringBuilder().append("0").append("\n").append(myD.getMetadata().getName()).toString();
+            String answer = new StringBuilder().append(myD.getMetadata().getName()).toString();
             response.getWriter().print(answer);
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().flush();
