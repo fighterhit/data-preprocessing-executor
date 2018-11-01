@@ -37,6 +37,7 @@ public class DockerAPITest {
                     .awaitImageId();
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            System.out.println(e.getMessage().contains("exit -1; fi' returned a non-zero code"));
         }
     }
 

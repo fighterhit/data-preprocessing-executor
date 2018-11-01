@@ -46,30 +46,29 @@ public class PushImageController implements HandlerI {
         try {
             Map<String, String[]> paramMap = request.getParameterMap();
             String imagePath = paramMap.get("imagePath")[0];
-            String check = paramMap.get("check")[0];
-            JSONObject jsonObject = JSON.parseObject(check);
+//            String check = paramMap.get("check")[0];
+//            JSONObject jsonObject = JSON.parseObject(check);
             Map<String, String> map = new HashMap<>();
             //解压，创建解压文件夹
             unCompressImageTar(imagePath, map);
             String desDir = map.get("desDir");
-            //todo 校验路径是否存在
-//            if (!jsonObject.isEmpty() && existFiles(desDir, jsonObject)) {
-            if (true) {
-                //先load
-                dockerImageHandler.load(imagePath);
-                //build：修改dockerfile模板后build
-                build(map);
-                //tag
-                String pushImageAndTag = getPushTag(map);
-                //push
-                dockerImageHandler.push(pushImageAndTag);
-                //return
-                response.getWriter().print(JSON.toJSONString(map));
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().flush();
-            } else {
-                response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, "verify error!");
-            }
+            //todo 校验路径是否存在 取消校验路径
+//            if (!jsonObject.isEmpty()) {
+            //先load
+            dockerImageHandler.load(imagePath);
+            //build：修改dockerfile模板后build
+            build(map);
+            //tag
+            String pushImageAndTag = getPushTag(map);
+            //push
+            dockerImageHandler.push(pushImageAndTag);
+            //return
+            response.getWriter().print(JSON.toJSONString(map));
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().flush();
+//            } else {
+//                response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, "verify error!");
+//            }
         } catch (Exception e) {
             LOGGER.error("server error! {}", ExceptionUtils.getFullStackTrace(e));
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "server error.");
@@ -121,7 +120,10 @@ public class PushImageController implements HandlerI {
             map.put("imageID", imageID);
             map.put("buildImageAndTag", buildImageAndTag);
         } catch (Exception e) {
-            LOGGER.error("build error! {}", ExceptionUtils.getFullStackTrace(e));
+            LOGGER.error("build image error! {}", ExceptionUtils.getFullStackTrace(e));
+            if (e.getMessage().contains("returned a non-zero code")) {
+                throw new Exception("check error!", e);
+            }
             throw e;
         }
     }
@@ -149,24 +151,5 @@ public class PushImageController implements HandlerI {
         String imageID = jsonObject.getString("Config");
         map.put("RepoTags", repoTags);
         map.put("imageID", imageID);
-    }
-
-    //检查文件是否存在
-    private boolean existFiles(String desDir, JSONObject jsonObject) {
-        //先检查路径是否存在
-        for (String checkPath : jsonObject.keySet()) {
-            if (!Files.isDirectory(Paths.get(desDir + checkPath))) {
-                return false;
-            }
-            String preFix = desDir + checkPath;
-            List<String> files = jsonObject.getJSONArray(checkPath).toJavaList(String.class);
-            //检查路径下文件是否存在
-            for (String file : files) {
-                if (!Files.exists(Paths.get(preFix + File.separator + file))) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 }
