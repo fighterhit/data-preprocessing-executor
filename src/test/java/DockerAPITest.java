@@ -28,12 +28,16 @@ public class DockerAPITest {
 
     @Test
     void testBuild() {
-        dockerClient.buildImageCmd()
+        try {
+            dockerClient.buildImageCmd()
 //                .withBaseDirectory(null)
-//                .withDockerfile(new File("/root/IdeaProjects/docker-registry-proxy/src/main/resources/Dockerfile.properties"))
-                .withTags(new HashSet<>(Arrays.asList("docker-java/load/1.0")))
-                .exec(new MyBuildImageResultCallback())
-                .awaitImageId();
+                    .withDockerfile(new File(ClassLoader.getSystemClassLoader().getResource("Dockerfile.properties").getFile()))
+                    .withTags(new HashSet<>(Arrays.asList("test:1.0")))
+                    .exec(new MyBuildImageResultCallback())
+                    .awaitImageId();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     class MyBuildImageResultCallback extends BuildImageResultCallback {
