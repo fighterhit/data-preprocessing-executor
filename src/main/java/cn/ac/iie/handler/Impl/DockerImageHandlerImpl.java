@@ -8,6 +8,7 @@ import com.github.dockerjava.api.model.*;
 import com.github.dockerjava.core.command.BuildImageResultCallback;
 import com.github.dockerjava.core.command.PullImageResultCallback;
 import com.github.dockerjava.core.command.PushImageResultCallback;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,13 +129,21 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
                 .awaitImageId();
     }
 
-    public String build(String dockerFile, String imageNameAndTag) {
-        return dockerClient.buildImageCmd()
-                .withNoCache(true)
-                .withDockerfile(new File(dockerFile))
-                .withTags(new HashSet<>(Arrays.asList(imageNameAndTag)))
-                .exec(new MyBuildImageResultCallback())
-                .awaitImageId();
+    public String build(String dockerFile, String imageNameAndTag) throws Exception {
+        try {
+            return dockerClient.buildImageCmd()
+                    .withNoCache(true)
+                    .withDockerfile(new File(dockerFile))
+                    .withTags(new HashSet<>(Arrays.asList(imageNameAndTag)))
+                    .exec(new MyBuildImageResultCallback())
+                    .awaitImageId();
+        } catch (Exception e) {
+            if (e.getMessage().contains("returned a non-zero code")) {
+                LOGGER.error("check image error! {}", ExceptionUtils.getFullStackTrace(e));
+                throw new Exception("check image error!", e);
+            }
+            throw e;
+        }
     }
 
     class MyBuildImageResultCallback extends BuildImageResultCallback {

@@ -124,10 +124,6 @@ public class PushImageController implements HandlerI {
             map.put("imageID", imageID);
             map.put("buildImageAndTag", buildImageAndTag);
         } catch (Exception e) {
-            if (e.getMessage().contains("returned a non-zero code")) {
-                LOGGER.error("check image error! {}", ExceptionUtils.getFullStackTrace(e));
-                throw new Exception("check image error!", e);
-            }
             LOGGER.error("build image error! {}", ExceptionUtils.getFullStackTrace(e));
             throw e;
         }

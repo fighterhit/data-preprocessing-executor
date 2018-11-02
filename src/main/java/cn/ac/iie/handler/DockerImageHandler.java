@@ -21,5 +21,5 @@ public interface DockerImageHandler {
 
     String build(String dockerFile);
 
-    String build(String dockerFile, String imageNameAndTag);
+    String build(String dockerFile, String imageNameAndTag) throws Exception;
 }
