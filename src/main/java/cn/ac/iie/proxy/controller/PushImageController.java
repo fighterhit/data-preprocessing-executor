@@ -52,81 +52,60 @@ public class PushImageController implements HandlerI {
             //解压，创建解压文件夹
             unCompressImageTar(imagePath, map);
             String desDir = map.get("desDir");
-            //todo 校验路径是否存在 取消校验路径
-//            if (!jsonObject.isEmpty()) {
             //先load
             dockerImageHandler.load(imagePath);
             //build：修改dockerfile模板后build
             build(map);
-            //tag
-            String pushImageAndTag = getPushTag(map);
             //push
-            dockerImageHandler.push(pushImageAndTag);
+            dockerImageHandler.push(map.get("newImageAndTag"));
             //return
             response.getWriter().print(JSON.toJSONString(map));
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().flush();
-//            } else {
-//                response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, "verify error!");
-//            }
         } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "server error.");
+            LOGGER.error("push image error! {}", ExceptionUtils.getFullStackTrace(e));
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "upload image error.");
         }
     }
 
-    private String getPushTag(Map<String, String> map) {
-        try {
-            String buildImageAndTag = map.get("buildImageAndTag");
-            String oldImage = buildImageAndTag.split(":")[0];
-            String tag = buildImageAndTag.split(":")[1];
-            String newImageName = new StringBuffer(ProxyMain.conf.getString(Constants.REGISTRY_REPO_NAME))
-                    .append("/")
-                    .append(ProxyMain.conf.getString(Constants.REGISTRY_PROJECT_NAME))
-                    .append("/")
-                    .append(oldImage).toString();
-            dockerImageHandler.tag(buildImageAndTag, newImageName, tag);
-            return newImageName + ":" + tag;
-        } catch (Exception e) {
-            LOGGER.error("getPushTag error! {}", ExceptionUtils.getFullStackTrace(e));
-            throw e;
-        }
-    }
-
+    //build 成新 image
     private void build(Map<String, String> map) throws Exception {
-        try {
-            //新tag名为：oldImageName_:oldTag
-            String oldImageNameTag = map.get("RepoTags");
-            String[] repoTags = oldImageNameTag.split(":");
-            String imageName = repoTags[0];
-            String tag = repoTags[1];
-            String buildImageAndTag = imageName + "_iie:" + tag;
+        //新tag名为：oldImageName_:oldTag
+        String oldImageNameTag = map.get("RepoTags");
+        String[] repoTags = oldImageNameTag.split(":");
+        String imageName = repoTags[0];
+        String tag = repoTags[1];
+//            String buildImageAndTag = imageName + "_iie:" + tag;
+        String newImageName = new StringBuffer(ProxyMain.conf.getString(Constants.REGISTRY_REPO_NAME))
+                .append("/")
+                .append(ProxyMain.conf.getString(Constants.REGISTRY_PROJECT_NAME))
+                .append("/")
+                .append(imageName).toString();
+        dockerImageHandler.tag(oldImageNameTag, newImageName, tag);
 
-            //修改Dockerfile模板，复制一份到解压文件中
-            String desDir = map.get("desDir");
-            String buildDockerfilePath = desDir + File.separator + "Dockerfile";
-            int ret = IOUtils.copy(new FileInputStream(Dockerfilepath), new FileOutputStream(buildDockerfilePath));
-            if (ret < 0) {
-                throw new Exception("copy Dockerfile.properties template error!");
-            }
-//
-            List<String> lines = Files.readAllLines(Paths.get(buildDockerfilePath));
-            for (int i = 0; i < lines.size(); i++) {
-                String line = lines.get(i);
-                if (line.startsWith("FROM")) {
-                    lines.set(i, line.replaceFirst("(?<=FROM )(.*)", oldImageNameTag));
-                    break;
-                }
-            }
-            //修改模板副本文件
-            IOUtils.writeLines(lines, IOUtils.LINE_SEPARATOR, new FileOutputStream(buildDockerfilePath));
-//            IOUtils.writeLines(lines, IOUtils.LINE_SEPARATOR, new FileWriter(buildDockerfilePath));
-            String imageID = dockerImageHandler.build(buildDockerfilePath, buildImageAndTag);
-            map.put("imageID", imageID);
-            map.put("buildImageAndTag", buildImageAndTag);
-        } catch (Exception e) {
-            LOGGER.error("build image error! {}", ExceptionUtils.getFullStackTrace(e));
-            throw e;
+        String newImageAndTag = new StringBuffer(newImageName).append(":").append(tag).toString();
+
+        //修改Dockerfile模板，复制一份到解压文件中
+        String desDir = map.get("desDir");
+        String buildDockerfilePath = desDir + File.separator + "Dockerfile";
+        int ret = IOUtils.copy(new FileInputStream(Dockerfilepath), new FileOutputStream(buildDockerfilePath));
+        if (ret < 0) {
+            throw new Exception("copy Dockerfile.properties template error!");
         }
+
+        List<String> lines = Files.readAllLines(Paths.get(buildDockerfilePath));
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (line.startsWith("FROM")) {
+                lines.set(i, line.replaceFirst("(?<=FROM )(.*)", oldImageNameTag));
+                break;
+            }
+        }
+        //修改模板副本文件
+        IOUtils.writeLines(lines, IOUtils.LINE_SEPARATOR, new FileOutputStream(buildDockerfilePath));
+        String imageID = dockerImageHandler.build(buildDockerfilePath, newImageAndTag);
+        map.put("imageID", imageID);
+        map.put("newImageAndTag", newImageAndTag);
     }
 
     //返回压缩文件目录、镜像名:标签
