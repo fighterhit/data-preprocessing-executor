@@ -48,6 +48,7 @@ public class PushImageController implements HandlerI {
         try {
             Map<String, String[]> paramMap = request.getParameterMap();
             String imagePath = paramMap.get("imagePath")[0];
+            LOGGER.info("receive request: imagePath {}", imagePath);
 //            String check = paramMap.get("check")[0];
 //            JSONObject jsonObject = JSON.parseObject(check);
             Map<String, String> map = new HashMap<>();
@@ -95,8 +96,8 @@ public class PushImageController implements HandlerI {
             throw new Exception("copy Dockerfile.properties template error!");
         }
 
-        String bootScriptPath = desDir + File.separator + "myStart.sh";
-        int copyShellRet = IOUtils.copy(new FileInputStream(bootScriptPath), new FileOutputStream(bootScriptPath));
+        String bootScriptCopyPath = desDir + File.separator + "myStart.sh";
+        int copyShellRet = IOUtils.copy(new FileInputStream(bootScriptPath), new FileOutputStream(bootScriptCopyPath));
         if (copyShellRet < 0) {
             throw new Exception("copy boot shell script error!");
         }

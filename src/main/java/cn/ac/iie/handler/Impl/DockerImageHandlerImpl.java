@@ -55,10 +55,9 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
         try {
             File file = new File(imagePath.trim());
             String fileName = file.getName();
-            String imageNameAndTag = fileName.substring(0, fileName.lastIndexOf('.'));
             InputStream uploadStream = new FileInputStream(file);
             dockerClient.loadImageCmd(uploadStream).exec();
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOGGER.error("load image error! {}", e);
             throw e;
         }
