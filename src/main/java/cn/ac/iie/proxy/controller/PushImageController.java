@@ -34,9 +34,11 @@ public class PushImageController implements HandlerI {
 
     //    private static String DockerfilePath ;
     private static final String Dockerfilepath;
+    private static final String bootScriptPath;
 
     static {
         Dockerfilepath = ClassLoader.getSystemClassLoader().getResource("Dockerfile.properties").getFile();
+        bootScriptPath = ClassLoader.getSystemClassLoader().getResource("myStart.sh").getFile();
     }
 
     //imagePath:url_test
@@ -88,9 +90,15 @@ public class PushImageController implements HandlerI {
         //修改Dockerfile模板，复制一份到解压文件中
         String desDir = map.get("desDir");
         String buildDockerfilePath = desDir + File.separator + "Dockerfile";
-        int ret = IOUtils.copy(new FileInputStream(Dockerfilepath), new FileOutputStream(buildDockerfilePath));
-        if (ret < 0) {
+        int copyDockerfileRet = IOUtils.copy(new FileInputStream(Dockerfilepath), new FileOutputStream(buildDockerfilePath));
+        if (copyDockerfileRet < 0) {
             throw new Exception("copy Dockerfile.properties template error!");
+        }
+
+        String bootScriptPath = desDir + File.separator + "myStart.sh";
+        int copyShellRet = IOUtils.copy(new FileInputStream(bootScriptPath), new FileOutputStream(bootScriptPath));
+        if (copyShellRet < 0) {
+            throw new Exception("copy boot shell script error!");
         }
 
         List<String> lines = Files.readAllLines(Paths.get(buildDockerfilePath));
