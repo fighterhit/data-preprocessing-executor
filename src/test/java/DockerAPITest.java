@@ -1,6 +1,7 @@
 
 import cn.ac.iie.common.DockerConfig;
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.AuthConfig;
 import com.github.dockerjava.api.model.Image;
 import com.github.dockerjava.api.model.PullResponseItem;
@@ -25,6 +26,18 @@ public class DockerAPITest {
             .withUsername("admin")
             .withPassword("Harbor12345")
             .withRegistryAddress("http://192.168.11.112/v2/");
+
+    @Test
+    void testCreate() {
+        try {
+            CreateContainerResponse response = dockerClient
+                    .createContainerCmd("prefix-random:0.2").withCmd("tes -d \"/app/bin\" -a  -d \"/app/lib\" -a -d \"/app/conf\" -a -d \"/app/resources\" -a -d \"/app/log\" -a -f \"/app/bin/start.sh\"  &&  echo true").exec();
+            System.out.println(response.getId());
+            System.out.println(response.getWarnings());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     void testBuild() {

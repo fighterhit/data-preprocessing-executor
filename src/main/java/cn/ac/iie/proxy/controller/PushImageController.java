@@ -70,22 +70,26 @@ public class PushImageController implements HandlerI {
 //                response.sendError(HttpServletResponse.SC_EXPECTATION_FAILED, "verify error!");
 //            }
         } catch (Exception e) {
-            LOGGER.error("server error! {}", ExceptionUtils.getFullStackTrace(e));
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "server error.");
         }
     }
 
     private String getPushTag(Map<String, String> map) {
-        String buildImageAndTag = map.get("buildImageAndTag");
-        String oldImage = buildImageAndTag.split(":")[0];
-        String tag = buildImageAndTag.split(":")[1];
-        String newImageName = new StringBuffer(ProxyMain.conf.getString(Constants.REGISTRY_REPO_NAME))
-                .append("/")
-                .append(ProxyMain.conf.getString(Constants.REGISTRY_PROJECT_NAME))
-                .append("/")
-                .append(oldImage).toString();
-        dockerImageHandler.tag(buildImageAndTag, newImageName, tag);
-        return newImageName + ":" + tag;
+        try {
+            String buildImageAndTag = map.get("buildImageAndTag");
+            String oldImage = buildImageAndTag.split(":")[0];
+            String tag = buildImageAndTag.split(":")[1];
+            String newImageName = new StringBuffer(ProxyMain.conf.getString(Constants.REGISTRY_REPO_NAME))
+                    .append("/")
+                    .append(ProxyMain.conf.getString(Constants.REGISTRY_PROJECT_NAME))
+                    .append("/")
+                    .append(oldImage).toString();
+            dockerImageHandler.tag(buildImageAndTag, newImageName, tag);
+            return newImageName + ":" + tag;
+        } catch (Exception e) {
+            LOGGER.error("getPushTag error! {}", ExceptionUtils.getFullStackTrace(e));
+            throw e;
+        }
     }
 
     private void build(Map<String, String> map) throws Exception {
@@ -120,10 +124,11 @@ public class PushImageController implements HandlerI {
             map.put("imageID", imageID);
             map.put("buildImageAndTag", buildImageAndTag);
         } catch (Exception e) {
-            LOGGER.error("build image error! {}", ExceptionUtils.getFullStackTrace(e));
             if (e.getMessage().contains("returned a non-zero code")) {
-                throw new Exception("check error!", e);
+                LOGGER.error("check image error! {}", ExceptionUtils.getFullStackTrace(e));
+                throw new Exception("check image error!", e);
             }
+            LOGGER.error("build image error! {}", ExceptionUtils.getFullStackTrace(e));
             throw e;
         }
     }

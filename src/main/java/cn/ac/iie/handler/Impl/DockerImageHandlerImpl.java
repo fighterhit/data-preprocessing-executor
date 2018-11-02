@@ -11,10 +11,7 @@ import com.github.dockerjava.core.command.PushImageResultCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -53,7 +50,7 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
      * @return
      */
     @Override
-    public Map<String, String> load(String imagePath) {
+    public Map<String, String> load(String imagePath) throws FileNotFoundException {
         Map<String, String> map = null;
         try {
             File file = new File(imagePath.trim());
@@ -65,7 +62,8 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
             map.put("imageName", imageNameAndTag[0]);
             map.put("tag", imageNameAndTag[1]);
         } catch (IOException e) {
-            LOGGER.error("{}", e);
+            LOGGER.error("load image error! {}", e);
+            throw e;
         }
         return map;
     }
@@ -75,6 +73,7 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
             dockerClient.tagImageCmd(oldImageNameAndTag, newImageName, newTag).exec();
         } catch (Exception e) {
             LOGGER.error("tag image: {} error! {}", e);
+            throw e;
         }
     }
 
@@ -88,6 +87,7 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
                     .awaitSuccess();
         } catch (Exception e) {
             LOGGER.error("push image: {} error! {}", imageNameAndTag, e);
+            throw e;
         }
     }
 
@@ -100,6 +100,7 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
                     .awaitSuccess();
         } catch (Exception e) {
             LOGGER.error("pull image: {} error! {}", imageNameAndTag, e);
+            throw e;
         }
     }
 
