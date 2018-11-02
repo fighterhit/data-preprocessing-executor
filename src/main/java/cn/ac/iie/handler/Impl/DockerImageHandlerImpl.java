@@ -51,22 +51,17 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
      * @return
      */
     @Override
-    public Map<String, String> load(String imagePath) throws FileNotFoundException {
-        Map<String, String> map = null;
+    public void load(String imagePath) throws FileNotFoundException {
         try {
             File file = new File(imagePath.trim());
             String fileName = file.getName();
-            String[] imageNameAndTag = fileName.substring(0, fileName.lastIndexOf('.')).split("_");
+            String imageNameAndTag = fileName.substring(0, fileName.lastIndexOf('.'));
             InputStream uploadStream = new FileInputStream(file);
             dockerClient.loadImageCmd(uploadStream).exec();
-            map = new HashMap<>();
-            map.put("imageName", imageNameAndTag[0]);
-            map.put("tag", imageNameAndTag[1]);
         } catch (IOException e) {
             LOGGER.error("load image error! {}", e);
             throw e;
         }
-        return map;
     }
 
     public void tag(String oldImageNameAndTag, String newImageName, String newTag) {
