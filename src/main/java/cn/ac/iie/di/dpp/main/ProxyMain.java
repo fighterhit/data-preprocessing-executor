@@ -1,9 +1,9 @@
-package cn.ac.iie;
+package cn.ac.iie.di.dpp.main;
 
-import cn.ac.iie.common.Constants;
+import cn.ac.iie.di.dpp.common.Constants;
 import cn.ac.iie.di.dpp.k8s.util.K8sUtil;
-import cn.ac.iie.handler.Impl.KillHandlerImpl;
-import cn.ac.iie.proxy.RegistryProxyServer;
+import cn.ac.iie.di.dpp.handler.Impl.KillHandlerImpl;
+import cn.ac.iie.di.dpp.proxy.RegistryProxyServer;
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.Configuration;
 import io.kubernetes.client.apis.AppsV1Api;
@@ -11,6 +11,8 @@ import io.kubernetes.client.apis.AutoscalingV2beta1Api;
 import io.kubernetes.client.apis.CoreV1Api;
 import io.kubernetes.client.apis.ExtensionsV1beta1Api;
 import io.kubernetes.client.util.Config;
+import io.kubernetes.client.util.KubeConfig;
+import io.kubernetes.client.util.credentials.KubeconfigAuthentication;
 import org.apache.commons.configuration2.FileBasedConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
@@ -63,6 +65,7 @@ public class ProxyMain {
             //k8s 相关
             ApiClient client = Config.fromUserPassword(conf.getString(Constants.K8S_MASTER), conf.getString(Constants.K8S_USERNAME), conf.getString(Constants.K8S_PASSWORD));
             Configuration.setDefaultApiClient(client);
+            client.setVerifyingSsl(false);
             appsV1Api = new AppsV1Api(client);
             api = new CoreV1Api();
             beta1api = new ExtensionsV1beta1Api(client);

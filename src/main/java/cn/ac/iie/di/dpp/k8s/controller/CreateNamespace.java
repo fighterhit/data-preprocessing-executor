@@ -17,8 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
-import static cn.ac.iie.ProxyMain.api;
-import static cn.ac.iie.ProxyMain.k8sUtil;
+import static cn.ac.iie.di.dpp.main.ProxyMain.api;
+import static cn.ac.iie.di.dpp.main.ProxyMain.k8sUtil;
 
 /**
  *

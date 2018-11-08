@@ -1,4 +1,4 @@
-package cn.ac.iie.common;
+package cn.ac.iie.di.dpp.common;
 
 /**
  * @author Fighter Created on 2018/9/27.

@@ -5,8 +5,8 @@
  */
 package cn.ac.iie.di.dpp.k8s.controller;
 
-import static cn.ac.iie.ProxyMain.api;
-import static cn.ac.iie.ProxyMain.k8sUtil;
+import static cn.ac.iie.di.dpp.main.ProxyMain.api;
+import static cn.ac.iie.di.dpp.main.ProxyMain.k8sUtil;
 import cn.ac.iie.di.commons.httpserver.framework.handler.HandlerI;
 import io.kubernetes.client.models.V1ResourceQuota;
 import java.util.Map;

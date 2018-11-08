@@ -1,6 +1,6 @@
-package cn.ac.iie.util;
+package cn.ac.iie.di.dpp.util;
 
-import cn.ac.iie.entity.HttpClientResult;
+import cn.ac.iie.di.dpp.entity.HttpClientResult;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.RequestConfig;

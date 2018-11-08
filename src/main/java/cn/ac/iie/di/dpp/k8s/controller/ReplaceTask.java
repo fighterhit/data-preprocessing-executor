@@ -5,29 +5,27 @@
  */
 package cn.ac.iie.di.dpp.k8s.controller;
 
-import static cn.ac.iie.di.dpp.main.ProxyMain.api;
-import static cn.ac.iie.di.dpp.main.ProxyMain.asV2Api;
-import static cn.ac.iie.di.dpp.main.ProxyMain.beta1api;
-import static cn.ac.iie.di.dpp.main.ProxyMain.k8sUtil;
 import cn.ac.iie.di.commons.httpserver.framework.handler.HandlerI;
 import io.kubernetes.client.models.ExtensionsV1beta1Deployment;
-import io.kubernetes.client.models.V1Service;
 import io.kubernetes.client.models.V2beta1HorizontalPodAutoscaler;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.eclipse.jetty.server.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
+
+import static cn.ac.iie.di.dpp.main.ProxyMain.*;
+
 /**
  *
  * @author Li Mingyang
  */
-public class CreateDeployment implements HandlerI {
+public class ReplaceTask implements HandlerI {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CreateDeployment.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReplaceTask.class);
 
     @Override
     public void execute(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -35,10 +33,10 @@ public class CreateDeployment implements HandlerI {
             Map<String, String[]> paramterMap = request.getParameterMap();
 
             String namespaceName = paramterMap.get("namespaceName")[0];
-            String deploymentName = paramterMap.get("deploymentName")[0];
+            String taskName = paramterMap.get("taskName")[0];
             String image = paramterMap.get("image")[0];
             int replicaRequest = Integer.parseInt(paramterMap.get("replicaRequest")[0]);
-            double podcpuRequest = Double.parseDouble(paramterMap.get("podcpuLimit")[0]);
+            double podcpuRequest = Double.parseDouble(paramterMap.get("podcpuRequest")[0]);
             double podcpuLimit = Double.parseDouble(paramterMap.get("podcpuLimit")[0]);
             long podmemoryRequest = Long.parseLong(paramterMap.get("podmemoryRequest")[0]);
             long podmemoryLimit = Long.parseLong(paramterMap.get("podmemoryLimit")[0]);
@@ -46,10 +44,11 @@ public class CreateDeployment implements HandlerI {
             int replicaLimit = Integer.parseInt(paramterMap.get("replicaLimit")[0]);
             int podcpuThreshold = Integer.parseInt(paramterMap.get("podcpuThreshold")[0]);
             int podmemoryThreshold = Integer.parseInt(paramterMap.get("podmemoryThreshold")[0]);
+            String taskParms = paramterMap.get("taskParms")[0];
 
-            LOGGER.info("Command is CreateDeployment and spec is \n"
+            LOGGER.info("Command is ReplaceTask and spec is \n"
                     + "namespaceName:" + namespaceName + "\n"
-                    + "deploymentName:" + deploymentName + "\n"
+                    + "taskName:" + taskName + "\n"
                     + "image:" + image + "\n"
                     + "replicaRequest:" + replicaRequest + "\n"
                     + "podcpuRequest:" + podcpuRequest + "\n"
@@ -59,21 +58,20 @@ public class CreateDeployment implements HandlerI {
                     + "containerPort:" + containerPort + "\n"
                     + "replicaLimit:" + replicaLimit + "\n"
                     + "podcpuThreshold:" + podcpuThreshold + "\n"
-                    + "podmemoryThreshold:" + podmemoryThreshold);
+                    + "podmemoryThreshold:" + podmemoryThreshold + "\n"
+                    + "taskParms:" + taskParms);
 
-            ExtensionsV1beta1Deployment myD = k8sUtil.CreateDeployment(beta1api, namespaceName,
-                    deploymentName, image, replicaRequest, podcpuRequest, podcpuLimit, podmemoryRequest, podmemoryLimit, containerPort);
-            LOGGER.info("Deployment " + myD.getMetadata().getName() + " is created.\n" + myD);
+            ExtensionsV1beta1Deployment myD = k8sUtil.ReplaceDeploymentWithParms(beta1api, namespaceName,
+                    taskName, image, replicaRequest, podcpuRequest, podcpuLimit, podmemoryRequest, podmemoryLimit, containerPort, taskParms);
+            LOGGER.info("Deployment " + myD.getMetadata().getName() + " is replaced.\n" + myD);
 
-            V1Service myS = k8sUtil.CreateService(api, namespaceName, deploymentName, containerPort);
-            LOGGER.info("Service " + myS.getMetadata().getName() + " is created.\n" + myS);
-
-            V2beta1HorizontalPodAutoscaler myHPA = k8sUtil.CreateHorizontalPodAutoscaler(asV2Api, deploymentName,
+//            V1Service myS = k8sUtil.ReplaceService(api, namespaceName, deploymentName, containerPort);
+//            LOGGER.info("Service " + myS.getMetadata().getName() + " is replaced.\n" + myS);
+            V2beta1HorizontalPodAutoscaler myHPA = k8sUtil.ReplaceHorizontalPodAutoscaler(asV2Api, taskName,
                     namespaceName, replicaRequest, replicaLimit, podcpuThreshold, podmemoryThreshold);
-            LOGGER.info("HorizontalPodAutoscaler " + myHPA.getMetadata().getName() + " is created.\n" + myHPA);
+            LOGGER.info("HorizontalPodAutoscaler " + myHPA.getMetadata().getName() + " is replaced.\n" + myHPA);
 
-            String answer = new StringBuilder().append(myS.getSpec().getPorts().get(0).getNodePort()).toString();
-
+            String answer = new StringBuilder().append(myD.getMetadata().getName()).toString();
             response.getWriter().print(answer);
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().flush();

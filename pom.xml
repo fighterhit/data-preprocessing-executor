@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.ac.iie</groupId>
-    <artifactId>docker-registry-proxy</artifactId>
+    <artifactId>data-preprocessing-executor</artifactId>
     <version>1.0</version>
 
     <properties>
@@ -165,5 +165,5 @@
             </resource>
         </resources>
     </build>
-
+    <name>data-preprocessing-executor</name>
 </project>

@@ -1,9 +1,9 @@
-package cn.ac.iie.proxy.controller;
+package cn.ac.iie.di.dpp.proxy.controller;
 
 import cn.ac.iie.di.commons.httpserver.framework.handler.HandlerI;
-import cn.ac.iie.entity.HttpClientResult;
-import cn.ac.iie.handler.Impl.RegistryHandlerImpl;
-import cn.ac.iie.handler.RegistryHandler;
+import cn.ac.iie.di.dpp.entity.HttpClientResult;
+import cn.ac.iie.di.dpp.handler.Impl.RegistryHandlerImpl;
+import cn.ac.iie.di.dpp.handler.RegistryHandler;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.eclipse.jetty.server.Request;
 import org.slf4j.Logger;

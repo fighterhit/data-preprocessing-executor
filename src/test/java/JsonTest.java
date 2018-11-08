@@ -1,4 +1,4 @@
-import cn.ac.iie.entity.Tag;
+import cn.ac.iie.di.dpp.entity.Tag;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import org.junit.jupiter.api.Test;

@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * @author root
  */
 public class K8sUtil {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(K8sUtil.class);
 
     public V1Namespace CreateNameSpace(CoreV1Api api, String namespaceName) throws ApiException {
@@ -211,6 +211,47 @@ public class K8sUtil {
         return beta1api.createNamespacedDeployment(namespaceName, ev1bd, "false");
     }
 
+    public ExtensionsV1beta1Deployment CreateDeploymentWithParms(ExtensionsV1beta1Api beta1api, String namespaceName, String deploymentName,
+            String image, int replicaRequest, double podcpuRequest, double podcpuLimit,
+            long podmemoryRequest, long podmemoryLimit, int containerPort, String taskParms) throws ApiException {
+        ExtensionsV1beta1Deployment ev1bd = new ExtensionsV1beta1Deployment();
+        V1ObjectMeta v1om = new V1ObjectMeta();
+        v1om.setName(deploymentName);
+        v1om.setNamespace(namespaceName);
+        ExtensionsV1beta1DeploymentSpec ev1bds = new ExtensionsV1beta1DeploymentSpec();
+        ev1bds.setReplicas(replicaRequest);
+        V1PodTemplateSpec v1pts = new V1PodTemplateSpec();
+        V1ObjectMeta v1ompod = new V1ObjectMeta();
+        Map<String, String> labels = new HashMap();
+        labels.put("run", deploymentName);
+        v1ompod.setLabels(labels);
+        V1PodSpec v1ps = new V1PodSpec();
+        V1Container v1c = new V1Container();
+        List<String> argss = new ArrayList();
+        argss.add(taskParms);
+        v1c.setArgs(argss);
+        v1c.setImage(image);
+        v1c.setName(deploymentName);
+        V1ContainerPort v1cp = new V1ContainerPort();
+        v1cp.containerPort(containerPort);
+        v1c.addPortsItem(v1cp);
+        V1ResourceRequirements v1rr = new V1ResourceRequirements();
+        v1rr.putRequestsItem("cpu", new Quantity(BigDecimal.valueOf(podcpuRequest), Quantity.Format.DECIMAL_SI));
+        v1rr.putRequestsItem("memory", new Quantity(BigDecimal.valueOf(podmemoryRequest), Quantity.Format.BINARY_SI));
+        v1rr.putLimitsItem("cpu", new Quantity(BigDecimal.valueOf(podcpuLimit), Quantity.Format.DECIMAL_SI));
+        v1rr.putLimitsItem("memory", new Quantity(BigDecimal.valueOf(podmemoryLimit), Quantity.Format.BINARY_SI));
+        v1c.setResources(v1rr);
+        v1ps.addContainersItem(v1c);
+        v1pts.setMetadata(v1ompod);
+        v1pts.setSpec(v1ps);
+        ev1bds.setTemplate(v1pts);
+        ev1bd.setApiVersion("extensions/v1beta1");
+        ev1bd.setKind("Deployment");
+        ev1bd.setMetadata(v1om);
+        ev1bd.setSpec(ev1bds);
+        return beta1api.createNamespacedDeployment(namespaceName, ev1bd, "false");
+    }
+
     public ExtensionsV1beta1Deployment ReplaceDeployment(ExtensionsV1beta1Api beta1api, String namespaceName, String deploymentName,
             String image, int replicaRequest, double podcpuRequest, double podcpuLimit,
             long podmemoryRequest, long podmemoryLimit, int containerPort) throws ApiException {
@@ -227,6 +268,47 @@ public class K8sUtil {
         v1ompod.setLabels(labels);
         V1PodSpec v1ps = new V1PodSpec();
         V1Container v1c = new V1Container();
+        v1c.setImage(image);
+        v1c.setName(deploymentName);
+        V1ContainerPort v1cp = new V1ContainerPort();
+        v1cp.containerPort(containerPort);
+        v1c.addPortsItem(v1cp);
+        V1ResourceRequirements v1rr = new V1ResourceRequirements();
+        v1rr.putRequestsItem("cpu", new Quantity(BigDecimal.valueOf(podcpuRequest), Quantity.Format.DECIMAL_SI));
+        v1rr.putRequestsItem("memory", new Quantity(BigDecimal.valueOf(podmemoryRequest), Quantity.Format.BINARY_SI));
+        v1rr.putLimitsItem("cpu", new Quantity(BigDecimal.valueOf(podcpuLimit), Quantity.Format.DECIMAL_SI));
+        v1rr.putLimitsItem("memory", new Quantity(BigDecimal.valueOf(podmemoryLimit), Quantity.Format.BINARY_SI));
+        v1c.setResources(v1rr);
+        v1ps.addContainersItem(v1c);
+        v1pts.setMetadata(v1ompod);
+        v1pts.setSpec(v1ps);
+        ev1bds.setTemplate(v1pts);
+        ev1bd.setApiVersion("extensions/v1beta1");
+        ev1bd.setKind("Deployment");
+        ev1bd.setMetadata(v1om);
+        ev1bd.setSpec(ev1bds);
+        return beta1api.replaceNamespacedDeployment(deploymentName, namespaceName, ev1bd, "false");
+    }
+
+    public ExtensionsV1beta1Deployment ReplaceDeploymentWithParms(ExtensionsV1beta1Api beta1api, String namespaceName, String deploymentName,
+            String image, int replicaRequest, double podcpuRequest, double podcpuLimit,
+            long podmemoryRequest, long podmemoryLimit, int containerPort, String taskParms) throws ApiException {
+        ExtensionsV1beta1Deployment ev1bd = new ExtensionsV1beta1Deployment();
+        V1ObjectMeta v1om = new V1ObjectMeta();
+        v1om.setName(deploymentName);
+        v1om.setNamespace(namespaceName);
+        ExtensionsV1beta1DeploymentSpec ev1bds = new ExtensionsV1beta1DeploymentSpec();
+        ev1bds.setReplicas(replicaRequest);
+        V1PodTemplateSpec v1pts = new V1PodTemplateSpec();
+        V1ObjectMeta v1ompod = new V1ObjectMeta();
+        Map<String, String> labels = new HashMap();
+        labels.put("run", deploymentName);
+        v1ompod.setLabels(labels);
+        V1PodSpec v1ps = new V1PodSpec();
+        V1Container v1c = new V1Container();
+        List<String> argss = new ArrayList();
+        argss.add(taskParms);
+        v1c.setArgs(argss);
         v1c.setImage(image);
         v1c.setName(deploymentName);
         V1ContainerPort v1cp = new V1ContainerPort();

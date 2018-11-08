@@ -25,9 +25,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author Li Mingyang
  */
-public class CreateDeployment implements HandlerI {
+public class CreateTask implements HandlerI {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CreateDeployment.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CreateTask.class);
 
     @Override
     public void execute(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -35,7 +35,7 @@ public class CreateDeployment implements HandlerI {
             Map<String, String[]> paramterMap = request.getParameterMap();
 
             String namespaceName = paramterMap.get("namespaceName")[0];
-            String deploymentName = paramterMap.get("deploymentName")[0];
+            String taskName = paramterMap.get("taskName")[0];
             String image = paramterMap.get("image")[0];
             int replicaRequest = Integer.parseInt(paramterMap.get("replicaRequest")[0]);
             double podcpuRequest = Double.parseDouble(paramterMap.get("podcpuLimit")[0]);
@@ -46,10 +46,11 @@ public class CreateDeployment implements HandlerI {
             int replicaLimit = Integer.parseInt(paramterMap.get("replicaLimit")[0]);
             int podcpuThreshold = Integer.parseInt(paramterMap.get("podcpuThreshold")[0]);
             int podmemoryThreshold = Integer.parseInt(paramterMap.get("podmemoryThreshold")[0]);
+            String taskParms = paramterMap.get("taskParms")[0];
 
-            LOGGER.info("Command is CreateDeployment and spec is \n"
+            LOGGER.info("Command is CreateTask and spec is \n"
                     + "namespaceName:" + namespaceName + "\n"
-                    + "deploymentName:" + deploymentName + "\n"
+                    + "taskName:" + taskName + "\n"
                     + "image:" + image + "\n"
                     + "replicaRequest:" + replicaRequest + "\n"
                     + "podcpuRequest:" + podcpuRequest + "\n"
@@ -59,16 +60,17 @@ public class CreateDeployment implements HandlerI {
                     + "containerPort:" + containerPort + "\n"
                     + "replicaLimit:" + replicaLimit + "\n"
                     + "podcpuThreshold:" + podcpuThreshold + "\n"
-                    + "podmemoryThreshold:" + podmemoryThreshold);
+                    + "podmemoryThreshold:" + podmemoryThreshold + "\n"
+                    + "taskParms:" + taskParms);
 
-            ExtensionsV1beta1Deployment myD = k8sUtil.CreateDeployment(beta1api, namespaceName,
-                    deploymentName, image, replicaRequest, podcpuRequest, podcpuLimit, podmemoryRequest, podmemoryLimit, containerPort);
+            ExtensionsV1beta1Deployment myD = k8sUtil.CreateDeploymentWithParms(beta1api, namespaceName,
+                    taskName, image, replicaRequest, podcpuRequest, podcpuLimit, podmemoryRequest, podmemoryLimit, containerPort, taskParms);
             LOGGER.info("Deployment " + myD.getMetadata().getName() + " is created.\n" + myD);
 
-            V1Service myS = k8sUtil.CreateService(api, namespaceName, deploymentName, containerPort);
+            V1Service myS = k8sUtil.CreateService(api, namespaceName, taskName, containerPort);
             LOGGER.info("Service " + myS.getMetadata().getName() + " is created.\n" + myS);
 
-            V2beta1HorizontalPodAutoscaler myHPA = k8sUtil.CreateHorizontalPodAutoscaler(asV2Api, deploymentName,
+            V2beta1HorizontalPodAutoscaler myHPA = k8sUtil.CreateHorizontalPodAutoscaler(asV2Api, taskName,
                     namespaceName, replicaRequest, replicaLimit, podcpuThreshold, podmemoryThreshold);
             LOGGER.info("HorizontalPodAutoscaler " + myHPA.getMetadata().getName() + " is created.\n" + myHPA);
 

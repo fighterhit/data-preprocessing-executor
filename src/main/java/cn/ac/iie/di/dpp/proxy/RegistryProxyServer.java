@@ -1,12 +1,12 @@
-package cn.ac.iie.proxy;
+package cn.ac.iie.di.dpp.proxy;
 
-import cn.ac.iie.ProxyMain;
-import cn.ac.iie.common.Constants;
+import cn.ac.iie.di.dpp.main.ProxyMain;
+import cn.ac.iie.di.dpp.common.Constants;
 import cn.ac.iie.di.commons.httpserver.framework.server.HttpServer;
 import cn.ac.iie.di.dpp.k8s.controller.*;
-import cn.ac.iie.proxy.controller.DeleteImageController;
-import cn.ac.iie.proxy.controller.HelloController;
-import cn.ac.iie.proxy.controller.PushImageController;
+import cn.ac.iie.di.dpp.proxy.controller.DeleteImageController;
+import cn.ac.iie.di.dpp.proxy.controller.HelloController;
+import cn.ac.iie.di.dpp.proxy.controller.PushImageController;
 import org.apache.log4j.Logger;
 
 /**
@@ -47,20 +47,31 @@ public class RegistryProxyServer {
 
         server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/createDeployment", CreateDeployment::new);
         server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/createDeployment/", CreateDeployment::new);
+        
+        server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/createTask", CreateTask::new);
+        server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/createTask/", CreateTask::new);
 
         server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/deleteNamespace", DeleteNamespace::new);
         server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/deleteNamespace/", DeleteNamespace::new);
 
         server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/deleteDeployment", DeleteDeployment::new);
         server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/deleteDeployment/", DeleteDeployment::new);
+        
+        server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/deleteTask", DeleteTask::new);
+        server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/deleteTask/", DeleteTask::new);
 
         server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/replaceNamespace", ReplaceNamespace::new);
         server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/replaceNamespace/", ReplaceNamespace::new);
 
         server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/replaceDeployment", ReplaceDeployment::new);
         server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/replaceDeployment/", ReplaceDeployment::new);
+        
+        server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/replaceTask", ReplaceTask::new);
+        server.registerContextHandler(REGISTRY_K8S_CONTEXT_URI, "/replaceTask/", ReplaceTask::new);
 
         server.startup();
+        
+        server.toString();
     }
 
     public void stop() throws Exception {

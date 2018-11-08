@@ -1,7 +1,7 @@
-package cn.ac.iie.handler.Impl;
+package cn.ac.iie.di.dpp.handler.Impl;
 
-import cn.ac.iie.handler.KillHandler;
-import cn.ac.iie.proxy.RegistryProxyServer;
+import cn.ac.iie.di.dpp.handler.KillHandler;
+import cn.ac.iie.di.dpp.proxy.RegistryProxyServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

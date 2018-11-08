@@ -1,6 +1,6 @@
-package cn.ac.iie.common;
+package cn.ac.iie.di.dpp.common;
 
-import cn.ac.iie.ProxyMain;
+import cn.ac.iie.di.dpp.main.ProxyMain;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.DockerCmdExecFactory;
 import com.github.dockerjava.core.DefaultDockerClientConfig;

@@ -1,4 +1,4 @@
-package cn.ac.iie.entity;
+package cn.ac.iie.di.dpp.entity;
 
 /**
  * @author Fighter Created on 2018/9/28.

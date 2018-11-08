@@ -6,6 +6,7 @@
 package cn.ac.iie.di.dpp.k8s.controller;
 
 import cn.ac.iie.di.commons.httpserver.framework.handler.HandlerI;
+import io.kubernetes.client.models.V1Status;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.eclipse.jetty.server.Request;
 import org.slf4j.Logger;
@@ -15,16 +16,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
-import static cn.ac.iie.di.dpp.main.ProxyMain.api;
-import static cn.ac.iie.di.dpp.main.ProxyMain.k8sUtil;
+import static cn.ac.iie.di.dpp.main.ProxyMain.*;
 
 /**
  *
  * @author Li Mingyang
  */
-public class DeleteNamespace implements HandlerI {
+public class DeleteTask implements HandlerI {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DeleteNamespace.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeleteTask.class);
 
     @Override
     public void execute(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -32,8 +32,13 @@ public class DeleteNamespace implements HandlerI {
             Map<String, String[]> paramterMap = request.getParameterMap();
 
             String namespaceName = paramterMap.get("namespaceName")[0];
-            k8sUtil.DeleteNameSpace(api, namespaceName);
-            String answer = new StringBuilder().append(namespaceName).toString();
+            String taskName = paramterMap.get("taskName")[0];
+
+            k8sUtil.DeleteHorizontalPodAutoscaler(asV2Api, taskName, namespaceName);
+            V1Status deleteServiceStatus = k8sUtil.DeleteService(api, taskName, namespaceName);
+            V1Status deleteDeploymentStatus = k8sUtil.DeleteDeployment(appsV1Api, taskName, namespaceName);
+
+            String answer = new StringBuilder().append(taskName).toString();
             response.getWriter().print(answer);
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().flush();

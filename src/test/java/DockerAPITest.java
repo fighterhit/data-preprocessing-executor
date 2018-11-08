@@ -1,5 +1,5 @@
 
-import cn.ac.iie.common.DockerConfig;
+import cn.ac.iie.di.dpp.common.DockerConfig;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.AuthConfig;

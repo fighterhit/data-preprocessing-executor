@@ -1,4 +1,4 @@
-package cn.ac.iie.entity;
+package cn.ac.iie.di.dpp.entity;
 
 import com.alibaba.fastjson.JSON;
 
