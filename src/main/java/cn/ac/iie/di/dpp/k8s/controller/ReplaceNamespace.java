@@ -8,6 +8,7 @@ package cn.ac.iie.di.dpp.k8s.controller;
 import static cn.ac.iie.di.dpp.main.ProxyMain.api;
 import static cn.ac.iie.di.dpp.main.ProxyMain.k8sUtil;
 import cn.ac.iie.di.commons.httpserver.framework.handler.HandlerI;
+import cn.ac.iie.di.dpp.proxy.RegistryProxyServer;
 import io.kubernetes.client.models.V1ResourceQuota;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +29,9 @@ public class ReplaceNamespace implements HandlerI {
     @Override
     public void execute(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws Exception {
         try {
+            RegistryProxyServer.count.incrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
+
             Map<String, String[]> paramterMap = request.getParameterMap();
 
             String namespaceName = paramterMap.get("namespaceName")[0];
@@ -36,7 +40,7 @@ public class ReplaceNamespace implements HandlerI {
             long memoryRequest = Long.parseLong(paramterMap.get("memoryRequest")[0]);
             double cpuLimit = Double.parseDouble(paramterMap.get("cpuLimit")[0]);
             long memoryLimit = Long.parseLong(paramterMap.get("memoryLimit")[0]);
-            
+
             LOGGER.info("Command is CreateNamespace and spec is \n"
                     + "namespaceName:" + namespaceName + "\n"
                     + "podLimit:" + podLimit + "\n"
@@ -48,10 +52,16 @@ public class ReplaceNamespace implements HandlerI {
             LOGGER.info("ResourceQuota " + myRQ.getMetadata().getName() + " is replaced.\n" + myRQ);
 
             String answer = new StringBuilder().append(namespaceName).toString();
+
+            RegistryProxyServer.count.decrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
+
             response.getWriter().print(answer);
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().flush();
         } catch (Exception e) {
+            RegistryProxyServer.count.decrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
             LOGGER.error("server error! {}", ExceptionUtils.getFullStackTrace(e));
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "request failed.Because " + e.getMessage());
         }

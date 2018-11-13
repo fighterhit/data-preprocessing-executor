@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 import static cn.ac.iie.di.dpp.main.ProxyMain.*;
+import cn.ac.iie.di.dpp.proxy.RegistryProxyServer;
 
 /**
  *
@@ -29,6 +30,9 @@ public class DeleteTask implements HandlerI {
     @Override
     public void execute(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws Exception {
         try {
+            RegistryProxyServer.count.incrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
+
             Map<String, String[]> paramterMap = request.getParameterMap();
 
             String namespaceName = paramterMap.get("namespaceName")[0];
@@ -39,10 +43,16 @@ public class DeleteTask implements HandlerI {
             V1Status deleteDeploymentStatus = k8sUtil.DeleteDeployment(appsV1Api, taskName, namespaceName);
 
             String answer = new StringBuilder().append(taskName).toString();
+
+            RegistryProxyServer.count.decrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
+
             response.getWriter().print(answer);
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().flush();
         } catch (Exception e) {
+            RegistryProxyServer.count.decrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
             LOGGER.error("server error! {}", ExceptionUtils.getFullStackTrace(e));
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "request failed.Because " + e.getMessage());
         }

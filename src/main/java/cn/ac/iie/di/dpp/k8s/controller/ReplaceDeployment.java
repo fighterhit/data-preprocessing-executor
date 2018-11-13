@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 import static cn.ac.iie.di.dpp.main.ProxyMain.*;
+import cn.ac.iie.di.dpp.proxy.RegistryProxyServer;
 
 /**
  *
@@ -30,11 +31,14 @@ public class ReplaceDeployment implements HandlerI {
     @Override
     public void execute(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws Exception {
         try {
+            RegistryProxyServer.count.incrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
+
             Map<String, String[]> paramterMap = request.getParameterMap();
 
             String namespaceName = paramterMap.get("namespaceName")[0];
-            String deploymentName =  paramterMap.get("deploymentName")[0];
-            String image =  paramterMap.get("image")[0];
+            String deploymentName = paramterMap.get("deploymentName")[0];
+            String image = paramterMap.get("image")[0];
             int replicaRequest = Integer.parseInt(paramterMap.get("replicaRequest")[0]);
             double podcpuRequest = Double.parseDouble(paramterMap.get("podcpuRequest")[0]);
             double podcpuLimit = Double.parseDouble(paramterMap.get("podcpuLimit")[0]);
@@ -65,16 +69,21 @@ public class ReplaceDeployment implements HandlerI {
 
 //            V1Service myS = k8sUtil.ReplaceService(api, namespaceName, deploymentName, containerPort);
 //            LOGGER.info("Service " + myS.getMetadata().getName() + " is replaced.\n" + myS);
-            
             V2beta1HorizontalPodAutoscaler myHPA = k8sUtil.ReplaceHorizontalPodAutoscaler(asV2Api, deploymentName,
                     namespaceName, replicaRequest, replicaLimit, podcpuThreshold, podmemoryThreshold);
             LOGGER.info("HorizontalPodAutoscaler " + myHPA.getMetadata().getName() + " is replaced.\n" + myHPA);
 
             String answer = new StringBuilder().append(myD.getMetadata().getName()).toString();
+
+            RegistryProxyServer.count.decrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
+
             response.getWriter().print(answer);
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().flush();
         } catch (Exception e) {
+            RegistryProxyServer.count.decrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
             LOGGER.error("server error! {}", ExceptionUtils.getFullStackTrace(e));
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "request failed.Because " + e.getMessage());
         }

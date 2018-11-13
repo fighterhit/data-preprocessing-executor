@@ -19,6 +19,7 @@ import java.util.Map;
 
 import static cn.ac.iie.di.dpp.main.ProxyMain.api;
 import static cn.ac.iie.di.dpp.main.ProxyMain.k8sUtil;
+import cn.ac.iie.di.dpp.proxy.RegistryProxyServer;
 
 /**
  *
@@ -31,6 +32,9 @@ public class CreateNamespace implements HandlerI {
     @Override
     public void execute(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws Exception {
         try {
+            RegistryProxyServer.count.incrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
+
             Map<String, String[]> paramterMap = request.getParameterMap();
 
             String namespaceName = paramterMap.get("namespaceName")[0];
@@ -54,11 +58,16 @@ public class CreateNamespace implements HandlerI {
             LOGGER.info("ResourceQuota " + myRQ.getMetadata().getName() + " is created.\n" + myRQ);
 
             String answer = new StringBuilder().append(myN.getMetadata().getName()).toString();
-            
+
+            RegistryProxyServer.count.decrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
+
             response.getWriter().print(answer);
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().flush();
         } catch (Exception e) {
+            RegistryProxyServer.count.decrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
             LOGGER.error("server error! {}", ExceptionUtils.getFullStackTrace(e));
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "request failed.Because " + e.getMessage());
         }

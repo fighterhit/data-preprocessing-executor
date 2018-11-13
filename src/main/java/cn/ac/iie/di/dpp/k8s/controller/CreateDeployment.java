@@ -10,6 +10,7 @@ import static cn.ac.iie.di.dpp.main.ProxyMain.asV2Api;
 import static cn.ac.iie.di.dpp.main.ProxyMain.beta1api;
 import static cn.ac.iie.di.dpp.main.ProxyMain.k8sUtil;
 import cn.ac.iie.di.commons.httpserver.framework.handler.HandlerI;
+import cn.ac.iie.di.dpp.proxy.RegistryProxyServer;
 import io.kubernetes.client.models.ExtensionsV1beta1Deployment;
 import io.kubernetes.client.models.V1Service;
 import io.kubernetes.client.models.V2beta1HorizontalPodAutoscaler;
@@ -32,6 +33,9 @@ public class CreateDeployment implements HandlerI {
     @Override
     public void execute(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws Exception {
         try {
+            RegistryProxyServer.count.incrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
+
             Map<String, String[]> paramterMap = request.getParameterMap();
 
             String namespaceName = paramterMap.get("namespaceName")[0];
@@ -74,10 +78,15 @@ public class CreateDeployment implements HandlerI {
 
             String answer = new StringBuilder().append(myS.getSpec().getPorts().get(0).getNodePort()).toString();
 
+            RegistryProxyServer.count.decrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
+
             response.getWriter().print(answer);
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().flush();
         } catch (Exception e) {
+            RegistryProxyServer.count.decrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
             LOGGER.error("server error! {}", ExceptionUtils.getFullStackTrace(e));
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "request failed.Because " + e.getMessage());
         }
