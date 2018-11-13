@@ -48,6 +48,10 @@ public class PushImageController implements HandlerI {
         try {
             Map<String, String[]> paramMap = request.getParameterMap();
             String imagePath = paramMap.get("imagePath")[0];
+            if (!Files.exists(Paths.get(imagePath))) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "image not found!");
+                return;
+            }
             LOGGER.info("receive request: imagePath {}", imagePath);
 //            String check = paramMap.get("check")[0];
 //            JSONObject jsonObject = JSON.parseObject(check);
