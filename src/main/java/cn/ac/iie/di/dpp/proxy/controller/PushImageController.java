@@ -1,11 +1,12 @@
 package cn.ac.iie.di.dpp.proxy.controller;
 
-import cn.ac.iie.di.dpp.main.ProxyMain;
+import cn.ac.iie.di.commons.httpserver.framework.handler.HandlerI;
 import cn.ac.iie.di.dpp.common.Constants;
 import cn.ac.iie.di.dpp.common.DockerConfig;
-import cn.ac.iie.di.commons.httpserver.framework.handler.HandlerI;
 import cn.ac.iie.di.dpp.handler.DockerImageHandler;
 import cn.ac.iie.di.dpp.handler.Impl.DockerImageHandlerImpl;
+import cn.ac.iie.di.dpp.main.ProxyMain;
+import cn.ac.iie.di.dpp.proxy.RegistryProxyServer;
 import cn.ac.iie.di.dpp.util.UnCompressUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -46,9 +47,24 @@ public class PushImageController implements HandlerI {
     @Override
     public void execute(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws Exception {
         try {
+            //每收到一个请求 计数器 +1
+            RegistryProxyServer.count.incrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
+
             Map<String, String[]> paramMap = request.getParameterMap();
             String imagePath = paramMap.get("imagePath")[0];
             LOGGER.info("receive request: imagePath {}", imagePath);
+
+            if (!Files.exists(Paths.get(imagePath))) {
+                //请求返回时 计数器 -1
+                RegistryProxyServer.count.decrementAndGet();
+                LOGGER.info("counter: {}", RegistryProxyServer.count.get());
+                Map errMsg = new HashMap();
+                errMsg.put("msg", "upload image error.");
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND, "image not found!");
+                response.getWriter().print(JSON.toJSONString(errMsg));
+                return;
+            }
 //            String check = paramMap.get("check")[0];
 //            JSONObject jsonObject = JSON.parseObject(check);
             Map<String, String> map = new HashMap<>();
@@ -61,13 +77,24 @@ public class PushImageController implements HandlerI {
             build(map);
             //push
             dockerImageHandler.push(map.get("newImageAndTag"));
+
+            //请求返回时 计数器 -1
+            RegistryProxyServer.count.decrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
             //return
             response.getWriter().print(JSON.toJSONString(map));
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().flush();
         } catch (Exception e) {
             LOGGER.error("push image error! {}", ExceptionUtils.getFullStackTrace(e));
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "upload image error.");
+            //请求返回时 计数器 -1
+            RegistryProxyServer.count.decrementAndGet();
+            LOGGER.info("counter: {}", RegistryProxyServer.count.get());
+
+            Map errMsg = new HashMap();
+            errMsg.put("msg", "upload image error.");
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "upload image error.");
+            response.getWriter().print(JSON.toJSONString(errMsg));
         }
     }
 
@@ -119,6 +146,7 @@ public class PushImageController implements HandlerI {
 
     //返回压缩文件目录、镜像名:标签
     private void unCompressImageTar(String imagePath, Map<String, String> map) throws Exception {
+        LOGGER.info("uncompressing image tar ....");
         try {
             String desDir = imagePath.substring(0, imagePath.lastIndexOf("."));
             UnCompressUtils.unTar(new File(imagePath), desDir);

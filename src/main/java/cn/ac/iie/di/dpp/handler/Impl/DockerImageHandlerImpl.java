@@ -52,6 +52,7 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
      */
     @Override
     public void load(String imagePath) throws FileNotFoundException {
+        LOGGER.info("load image tar ....");
         try {
             File file = new File(imagePath.trim());
             String fileName = file.getName();
@@ -63,7 +64,9 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
         }
     }
 
+    @Override
     public void tag(String oldImageNameAndTag, String newImageName, String newTag) {
+        LOGGER.info("tag image ....");
         try {
             dockerClient.tagImageCmd(oldImageNameAndTag, newImageName, newTag).exec();
         } catch (Exception e) {
@@ -74,6 +77,7 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
 
     @Override
     public void push(String imageNameAndTag) {
+        LOGGER.info("push image ...");
         try {
             //push image
             dockerClient.pushImageCmd(imageNameAndTag)
@@ -88,6 +92,7 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
 
     @Override
     public void pull(String imageNameAndTag) {
+        LOGGER.info("pull image ...");
         try {
             //pull image
             dockerClient.pullImageCmd(imageNameAndTag)
@@ -117,13 +122,16 @@ public class DockerImageHandlerImpl implements DockerImageHandler {
 
     @Override
     public String build(String dockerFile) {
+        LOGGER.info("build image ...");
         return dockerClient.buildImageCmd()
                 .withDockerfile(new File(dockerFile))
                 .exec(new MyBuildImageResultCallback())
                 .awaitImageId();
     }
 
+    @Override
     public String build(String dockerFile, String imageNameAndTag) throws Exception {
+        LOGGER.info("build image ...");
         try {
             return dockerClient.buildImageCmd()
                     .withNoCache(true)
