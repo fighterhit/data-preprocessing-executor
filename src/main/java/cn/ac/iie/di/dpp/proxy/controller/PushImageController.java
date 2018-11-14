@@ -60,28 +60,30 @@ public class PushImageController implements HandlerI {
                 RegistryProxyServer.count.decrementAndGet();
                 LOGGER.info("counter: {}", RegistryProxyServer.count.get());
                 Map errMsg = new HashMap();
+                errMsg.put("code", 404);
                 errMsg.put("msg", "upload image error.");
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND, "image not found!");
+                response.setStatus(HttpServletResponse.SC_OK, "image not found!");
                 response.getWriter().print(JSON.toJSONString(errMsg));
                 return;
             }
 //            String check = paramMap.get("check")[0];
 //            JSONObject jsonObject = JSON.parseObject(check);
-            Map<String, String> map = new HashMap<>();
+            Map<String, Object> map = new HashMap<>();
             //解压，创建解压文件夹
             unCompressImageTar(imagePath, map);
-            String desDir = map.get("desDir");
+            String desDir = (String) map.get("desDir");
             //先load
             dockerImageHandler.load(imagePath);
             //build：修改dockerfile模板后build
             build(map);
             //push
-            dockerImageHandler.push(map.get("newImageAndTag"));
+            dockerImageHandler.push((String) map.get("newImageAndTag"));
 
             //请求返回时 计数器 -1
             RegistryProxyServer.count.decrementAndGet();
             LOGGER.info("counter: {}", RegistryProxyServer.count.get());
             //return
+            map.put("code", 200);
             response.getWriter().print(JSON.toJSONString(map));
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().flush();
@@ -92,16 +94,17 @@ public class PushImageController implements HandlerI {
             LOGGER.info("counter: {}", RegistryProxyServer.count.get());
 
             Map errMsg = new HashMap();
+            errMsg.put("code", 400);
             errMsg.put("msg", "upload image error.");
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "upload image error.");
+            response.setStatus(HttpServletResponse.SC_OK, "upload image error.");
             response.getWriter().print(JSON.toJSONString(errMsg));
         }
     }
 
     //build 成新 image
-    private void build(Map<String, String> map) throws Exception {
+    private void build(Map<String, Object> map) throws Exception {
         //新tag名为：oldImageName_:oldTag
-        String oldImageNameTag = map.get("RepoTags");
+        String oldImageNameTag = (String) map.get("RepoTags");
         String[] repoTags = oldImageNameTag.split(":");
         String imageName = repoTags[0];
         String tag = repoTags[1];
@@ -116,7 +119,7 @@ public class PushImageController implements HandlerI {
         String newImageAndTag = new StringBuffer(newImageName).append(":").append(tag).toString();
 
         //修改Dockerfile模板，复制一份到解压文件中
-        String desDir = map.get("desDir");
+        String desDir = (String) map.get("desDir");
         String buildDockerfilePath = desDir + File.separator + "Dockerfile";
         int copyDockerfileRet = IOUtils.copy(new FileInputStream(Dockerfilepath), new FileOutputStream(buildDockerfilePath));
         if (copyDockerfileRet < 0) {
@@ -145,7 +148,7 @@ public class PushImageController implements HandlerI {
     }
 
     //返回压缩文件目录、镜像名:标签
-    private void unCompressImageTar(String imagePath, Map<String, String> map) throws Exception {
+    private void unCompressImageTar(String imagePath, Map<String, Object> map) throws Exception {
         LOGGER.info("uncompressing image tar ....");
         try {
             String desDir = imagePath.substring(0, imagePath.lastIndexOf("."));
@@ -159,7 +162,7 @@ public class PushImageController implements HandlerI {
     }
 
     //    @Test
-    private void getRepoTags(String desDir, Map<String, String> map) throws IOException {
+    private void getRepoTags(String desDir, Map<String, Object> map) throws IOException {
         //读取压缩文件目录内的 manifest.json
         InputStream inputStream = new FileInputStream(desDir + File.separator + "manifest.json");
         String jsonStr = IOUtils.toString(inputStream, "utf8");
