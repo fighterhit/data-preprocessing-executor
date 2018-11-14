@@ -56,6 +56,7 @@ public class PushImageController implements HandlerI {
             LOGGER.info("receive request: imagePath {}", imagePath);
 
             if (!Files.exists(Paths.get(imagePath))) {
+                LOGGER.info("image tar: {} not found!", imagePath);
                 //请求返回时 计数器 -1
                 RegistryProxyServer.count.decrementAndGet();
                 LOGGER.info("counter: {}", RegistryProxyServer.count.get());
