@@ -124,7 +124,7 @@
                 <configuration>
                     <appendAssemblyId>true</appendAssemblyId>
                     <!--打包名称-->
-                    <finalName>docker-registry-proxy</finalName>
+                    <finalName>data-preprocessing-executor</finalName>
                     <descriptors>
                         <descriptor>src/main/assembly/bin.xml</descriptor>
                     </descriptors>
