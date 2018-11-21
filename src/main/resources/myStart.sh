@@ -1,2 +1,2 @@
-# some codes
-bash /app/bin/start.sh
+#!/bin/bash
+/app/bin/start.sh
