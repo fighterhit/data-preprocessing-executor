@@ -25,5 +25,5 @@ for f in $PROJECT_LIB_DIR/*.jar; do
 done
 export CLASSPATH
 
-CLASSNAME="cn.ac.iie.ProxyMain"
+CLASSNAME="cn.ac.iie.di.dpp.main.ProxyMain"
 
