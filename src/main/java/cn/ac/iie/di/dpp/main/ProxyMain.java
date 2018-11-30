@@ -1,8 +1,8 @@
 package cn.ac.iie.di.dpp.main;
 
 import cn.ac.iie.di.dpp.common.Constants;
-import cn.ac.iie.di.dpp.k8s.util.K8sUtil;
 import cn.ac.iie.di.dpp.handler.Impl.KillHandlerImpl;
+import cn.ac.iie.di.dpp.k8s.util.K8sUtil;
 import cn.ac.iie.di.dpp.proxy.RegistryProxyServer;
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.Configuration;
@@ -11,8 +11,6 @@ import io.kubernetes.client.apis.AutoscalingV2beta1Api;
 import io.kubernetes.client.apis.CoreV1Api;
 import io.kubernetes.client.apis.ExtensionsV1beta1Api;
 import io.kubernetes.client.util.Config;
-import io.kubernetes.client.util.KubeConfig;
-import io.kubernetes.client.util.credentials.KubeconfigAuthentication;
 import org.apache.commons.configuration2.FileBasedConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
@@ -95,6 +93,7 @@ public class ProxyMain {
             new KillHandlerImpl(service).startShutdownHook();
 
             //启动代理服务
+
             service.start();
 
             LOGGER.info("registry service start success...");

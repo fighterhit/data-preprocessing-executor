@@ -90,6 +90,7 @@ public class RegistryProxyServer {
             //若计数器不为0，循环检测3次，最长等待15s
             for (; i < 3; i++) {
                 if (count.get() != 0) {
+                    LOGGER.info("sleeping {} for wait...", i + 1);
                     Thread.sleep(5000);
                 } else {
                     break;
