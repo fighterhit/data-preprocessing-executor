@@ -68,7 +68,6 @@ public class DockerAPITest {
 //            dockerClient.loadImageCmd(uploadStream).exec();
 //            ftp.downFile("thinkphp_5.0.10_full.zip","thinkphp_5.0.10_full.zip");
 //            ftp.downFile("image_1.0.tar","image_1.0.tar");
-//            ftp.ftpClient.retrieveFile("test.txt",new FileOutputStream("test.txt"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -94,6 +93,17 @@ public class DockerAPITest {
     }
 
     @Test
+    void testRemove() {
+        try {
+//            String imageName = "docker-java/load:1.0";
+            String imageName = "192.168.11.112/hlg_web/nginx";
+            dockerClient.removeImageCmd(imageName).exec();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
     public void tag() {
         try {
             dockerClient.tagImageCmd("docker-java/load:1.0", "docker-java/load", "2.0").exec();
@@ -106,9 +116,10 @@ public class DockerAPITest {
     public void push() {
         try {
             //push image
-            dockerClient.pushImageCmd("192.168.11.112/hlg_web/busybox:test")
+            dockerClient.pushImageCmd("192.168.11.112/hlg_web/docker-java/load:1.0")
                     .withAuthConfig(authConfig)
-                    .exec(new MyPushImageResultCallback("192.168.11.112/hlg_web/busybox:harbortest"))
+                    .exec(new MyPushImageResultCallback("192.168.11.112/hlg_web/docker-java/load:1.0"))
+                    .awaitCompletion()
                     .awaitSuccess();
         } catch (Exception e) {
             e.printStackTrace();
