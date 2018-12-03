@@ -24,4 +24,6 @@ public interface Constants {
     String K8S_MASTER = "k8s.master";
     String K8S_USERNAME = "k8s.username";
     String K8S_PASSWORD = "k8s.password";
+    String ES_MASTER = "es.master";
+    String FILEBEAT_IMAGE = "filebeat.image";
 }

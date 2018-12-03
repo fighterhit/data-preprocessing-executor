@@ -79,11 +79,11 @@ public class ProxyMain {
         Parameters params = new Parameters();
         FileBasedConfigurationBuilder<FileBasedConfiguration> confBuilder
                 = new FileBasedConfigurationBuilder<FileBasedConfiguration>(
-                        PropertiesConfiguration.class)
-                        .configure(params.properties()
-                                .setFileName(PROPERTIES_PATH)
-                                .setListDelimiterHandler(new DefaultListDelimiterHandler(','))
-                                .setThrowExceptionOnMissing(true));
+                PropertiesConfiguration.class)
+                .configure(params.properties()
+                        .setFileName(PROPERTIES_PATH)
+                        .setListDelimiterHandler(new DefaultListDelimiterHandler(','))
+                        .setThrowExceptionOnMissing(true));
         return confBuilder.getConfiguration();
     }
 
