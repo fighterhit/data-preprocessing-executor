@@ -1,58 +1,54 @@
 package cn.ac.iie.di.dpp.proxy.controller;
 
-import cn.ac.iie.entity.Project;
-import cn.ac.iie.entity.Repository;
-import cn.ac.iie.handler.Impl.RegistryHandlerImpl;
-import cn.ac.iie.handler.RegistryHandler;
-import cn.ac.iie.proxy.result.CodeMsg;
-import cn.ac.iie.proxy.result.Result;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import cn.ac.iie.di.commons.httpserver.framework.handler.HandlerI;
+import cn.ac.iie.di.dpp.handler.Impl.RegistryHandlerImpl;
+import cn.ac.iie.di.dpp.handler.RegistryHandler;
+import cn.ac.iie.di.dpp.proxy.RegistryProxyServer;
+import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.eclipse.jetty.server.Request;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Fighter Created on 2018/10/8.
  */
-@RestController
-@RequestMapping(value = "/registry")
-public class RegistryController {
+public class RegistryController implements HandlerI {
 
-    private RegistryHandler registryHandler = new RegistryHandlerImpl();
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegistryController.class);
+    private RegistryHandler RegistryHandler = new RegistryHandlerImpl();
 
-    @GetMapping(value = "/projects")
-    public Result<List<Project>> listProjects() {
-        try {
-            return registryHandler.listProjects();
-        } catch (Exception e) {
-            return Result.error(CodeMsg.LIST_REGISTRY_ERROR);
-        }
-    }
+    @Override
+    public void execute(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws Exception {
+       try {
+           //每收到一个请求 计数器 +1
+           RegistryProxyServer.count.incrementAndGet();
+           LOGGER.info("counter: {}", RegistryProxyServer.count.get());
+           Map<String, String[]> paramMap = request.getParameterMap();
+           String repositoryName = paramMap.get("repositoryName")[0];
+           LOGGER.info("receive request: repositoryName {}", repositoryName);
+           String tagsInfo = RegistryHandler.listTagsOfRepository(repositoryName);
+           Map<String,Object> res = new HashMap<>();
+           res.put("tags",tagsInfo);
+           response.getWriter().print(JSON.toJSONString(res));
+           response.setStatus(HttpServletResponse.SC_OK);
+           response.getWriter().flush();
+       }catch (Exception e){
+           LOGGER.error("get images info error! {}", ExceptionUtils.getFullStackTrace(e));
+           //请求返回时 计数器 -1
+           RegistryProxyServer.count.decrementAndGet();
+           LOGGER.info("counter: {}", RegistryProxyServer.count.get());
 
-    @GetMapping(value = "/repositories")
-    public Result<List<Repository>> listRepostories(@RequestParam(value = "projectId", defaultValue = "2") String projectId) {
-        try {
-            Result<List<Repository>> result = registryHandler.listRepostories(projectId);
-            return result;
-        } catch (Exception e) {
-            return Result.error(CodeMsg.LIST_REPOSITORY_ERROR);
-        }
-    }
-
-    @GetMapping(value = "/remove")
-    public Result<Integer> removeImage(@RequestParam("imageName") String imageName,
-                                       @RequestParam("tag") String tag) {
-        if (tag == null) {
-            return registryHandler.deleteRepository(imageName);
-        }
-        //tag不一样，但image id一样都会被删除
-        return registryHandler.deleteRepository(imageName, tag);
-    }
-
-    @GetMapping(value = "/tags")
-    public Result<List<String>> listTagsOfRepository(@RequestParam("repositoryName") String repositoryName) {
-        return registryHandler.listTagsOfRepository(repositoryName);
+           Map errMsg = new HashMap();
+           errMsg.put("code", 400);
+           errMsg.put("msg", "get images info error!");
+           response.setStatus(HttpServletResponse.SC_OK, "get images info error!");
+           response.getWriter().print(JSON.toJSONString(errMsg));
+       }
     }
 }

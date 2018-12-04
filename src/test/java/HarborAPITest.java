@@ -74,6 +74,23 @@ public class HarborAPITest {
         }
     }
 
+    @Test
+    void testlistTagsOfRepository2() {
+        try {
+            Map<String, String> headers = new HashMap<>();
+            headers.put("accept", "application/json");
+            headers.put("authorization", "Basic YWRtaW46SGFyYm9yMTIzNDU=");
+            String reqUrl = new StringBuffer("http://192.168.11.200/api")
+                    .append("/repositories/")
+                    .append("hlg_web/filebeat")
+                    .append("/tags")
+                    .toString();
+            HttpClientResult result = HttpClientUtils.doGet(reqUrl, headers, null);
+            System.out.println(result.getContent());
+        } catch (Exception e) {
+        }
+    }
+
 
     @Test
     void deleteRepository() {

@@ -49,7 +49,7 @@ public interface RegistryHandler {
      * @param repositoryName
      * @return
      */
-    List<String> listTagsOfRepository(String repositoryName);
-
+//    List<String> listTagsOfRepository(String repositoryName);
+    String listTagsOfRepository(String repositoryName);
 
 }

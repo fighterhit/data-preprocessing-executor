@@ -1,12 +1,11 @@
 package cn.ac.iie.di.dpp.handler.Impl;
 
-import cn.ac.iie.di.dpp.main.ProxyMain;
 import cn.ac.iie.di.dpp.common.Constants;
 import cn.ac.iie.di.dpp.entity.HttpClientResult;
 import cn.ac.iie.di.dpp.entity.Project;
 import cn.ac.iie.di.dpp.entity.Repository;
-import cn.ac.iie.di.dpp.entity.Tag;
 import cn.ac.iie.di.dpp.handler.RegistryHandler;
+import cn.ac.iie.di.dpp.main.ProxyMain;
 import cn.ac.iie.di.dpp.util.HttpClientUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Fighter Created on 2018/9/28.
@@ -116,9 +114,29 @@ public class RegistryHandlerImpl implements RegistryHandler {
         return result;
     }
 
+    /*   @Override
+       public List<String> listTagsOfRepository(String repositoryName) {
+           List<String> tags = null;
+           try {
+               Map<String, String> headers = new HashMap<>();
+               headers.put("accept", "application/json");
+               headers.put("authorization", "Basic YWRtaW46SGFyYm9yMTIzNDU=");
+               String reqUrl = new StringBuffer(harborBaseAPI)
+                       .append("/repositories/")
+                       .append(repositoryName)
+                       .append("/tags")
+                       .toString();
+               HttpClientResult result = HttpClientUtils.doGet(reqUrl, headers, null);
+               JSONArray jsonArray = JSON.parseArray(result.getContent());
+               tags = jsonArray.toJavaList(Tag.class).stream().map(Tag::getName).collect(Collectors.toList());
+           } catch (Exception e) {
+               LOGGER.error("list tags error! {}", e);
+           }
+           return tags;
+       }*/
+
     @Override
-    public List<String> listTagsOfRepository(String repositoryName) {
-        List<String> tags = null;
+    public String listTagsOfRepository(String repositoryName) {
         try {
             Map<String, String> headers = new HashMap<>();
             headers.put("accept", "application/json");
@@ -129,11 +147,10 @@ public class RegistryHandlerImpl implements RegistryHandler {
                     .append("/tags")
                     .toString();
             HttpClientResult result = HttpClientUtils.doGet(reqUrl, headers, null);
-            JSONArray jsonArray = JSON.parseArray(result.getContent());
-            tags = jsonArray.toJavaList(Tag.class).stream().map(Tag::getName).collect(Collectors.toList());
+            return result.getContent();
         } catch (Exception e) {
             LOGGER.error("list tags error! {}", e);
         }
-        return tags;
+        return null;
     }
 }
