@@ -33,7 +33,6 @@ public class PushImageController implements HandlerI {
     private static final Logger LOGGER = LoggerFactory.getLogger(PushImageController.class);
     private DockerImageHandler dockerImageHandler = new DockerImageHandlerImpl(DockerConfig.getDockerClient());
 
-    //    private static String DockerfilePath ;
     private static final String Dockerfilepath;
     private static final String bootScriptPath;
 
@@ -43,7 +42,6 @@ public class PushImageController implements HandlerI {
     }
 
     //imagePath:url_test
-    //check:{"path1":["path1File1","path1File2"],"path2":["path2File1","path2File2"]}
     @Override
     public void execute(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws Exception {
         try {
@@ -62,13 +60,11 @@ public class PushImageController implements HandlerI {
                 LOGGER.info("counter: {}", RegistryProxyServer.count.get());
                 Map errMsg = new HashMap();
                 errMsg.put("code", 404);
-                errMsg.put("msg", "upload image error.");
+                errMsg.put("msg", "upload image error, image not found!");
                 response.setStatus(HttpServletResponse.SC_OK, "image not found!");
                 response.getWriter().print(JSON.toJSONString(errMsg));
                 return;
             }
-//            String check = paramMap.get("check")[0];
-//            JSONObject jsonObject = JSON.parseObject(check);
             Map<String, Object> map = new HashMap<>();
             //解压，创建解压文件夹
             unCompressImageTar(imagePath, map);
@@ -96,7 +92,7 @@ public class PushImageController implements HandlerI {
 
             Map errMsg = new HashMap();
             errMsg.put("code", 400);
-            errMsg.put("msg", "upload image error.");
+            errMsg.put("msg", e.getMessage());
             response.setStatus(HttpServletResponse.SC_OK, "upload image error.");
             response.getWriter().print(JSON.toJSONString(errMsg));
         }
@@ -164,13 +160,21 @@ public class PushImageController implements HandlerI {
 
     //    @Test
     private void getRepoTags(String desDir, Map<String, Object> map) throws IOException {
-        //读取压缩文件目录内的 manifest.json
-        InputStream inputStream = new FileInputStream(desDir + File.separator + "manifest.json");
-        String jsonStr = IOUtils.toString(inputStream, "utf8");
-        JSONObject jsonObject = JSONObject.parseArray(jsonStr).getJSONObject(0);
-        String repoTags = jsonObject.getJSONArray("RepoTags").getString(0);
-        String imageID = jsonObject.getString("Config");
-        map.put("RepoTags", repoTags);
-        map.put("imageID", imageID);
+        try {
+            //读取压缩文件目录内的 manifest.json
+            InputStream inputStream = new FileInputStream(desDir + File.separator + "manifest.json");
+            String jsonStr = IOUtils.toString(inputStream, "utf8");
+            JSONObject jsonObject = JSONObject.parseArray(jsonStr).getJSONObject(0);
+            String repoTags = jsonObject.getJSONArray("RepoTags").getString(0);
+            String imageID = jsonObject.getString("Config");
+            map.put("RepoTags", repoTags);
+            map.put("imageID", imageID);
+        } catch (FileNotFoundException e) {
+            LOGGER.error("manifest.json file not found!");
+            throw e;
+        } catch (NullPointerException e) {
+            LOGGER.error("'RepoTags' value in manifest.json not exist!");
+            throw e;
+        }
     }
 }
