@@ -147,23 +147,7 @@
                     <skip>false</skip>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/*.*</include>
-                </includes>
-                <!-- <excludes>
-                    <exclude>*.properties</exclude>
-                </excludes>-->
-            </resource>
-        </resources>
     </build>
     <name>data-preprocessing-executor</name>
 </project>
