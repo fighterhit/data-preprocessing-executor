@@ -1,21 +1,16 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: logcollection-test2
+  name: logcollection-test
+  namespace: default
 spec:
+  replicas: 1
   template:
     metadata:
       labels:
-        k8s-app: logcollection-test
+        run: logcollection-test
     spec:
       containers:
-      - image: 192.168.11.200/hlg_web/filebeat:v5.4.0
-        name: filebeat
-        volumeMounts:
-        - name: app-logs
-          mountPath: /log
-        - name: filebeat-config
-          mountPath: /etc/filebeat/
       - image: 192.168.11.200/hlg_web/datalower:1.1
         name: app
         ports:
@@ -23,6 +18,13 @@ spec:
         volumeMounts:
         - name: app-logs
           mountPath: /app/log
+      - image: 192.168.11.200/hlg_web/filebeat:v5.4.0
+        name: filebeat
+        volumeMounts:
+        - name: app-logs
+          mountPath: /log
+        - name: filebeat-config
+          mountPath: /etc/filebeat/
       volumes:
       - name: app-logs
         emptyDir: {}
@@ -42,4 +44,4 @@ data:
         - "/log/*"
     output.elasticsearch:
       hosts: ["192.168.11.218:9200"]
-      index: "logcollection-test2"
+      index: "logcollection-test"
