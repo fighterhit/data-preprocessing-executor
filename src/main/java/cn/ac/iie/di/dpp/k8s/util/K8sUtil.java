@@ -212,6 +212,7 @@ public class K8sUtil {
         spec.getVolumes().get(1).getConfigMap().setName(configMapName);
 
         V1ConfigMap v1cf = api.createNamespacedConfigMap(namespaceName, configMap, null);
+        LOGGER.info("ConfigMap " + v1cf.getMetadata().getName() + " is created.\n" + v1cf);
         return beta1api.createNamespacedDeployment(namespaceName, deployment, "false");
 /*        ExtensionsV1beta1Deployment ev1bd = new ExtensionsV1beta1Deployment();
         V1ObjectMeta v1om = new V1ObjectMeta();
@@ -294,6 +295,7 @@ public class K8sUtil {
         spec.getVolumes().get(1).getConfigMap().setName(configMapName);
 
         V1ConfigMap v1cf = api.createNamespacedConfigMap(namespaceName, configMap, null);
+        LOGGER.info("ConfigMap " + v1cf.getMetadata().getName() + " is created.\n" + v1cf);
         return beta1api.createNamespacedDeployment(namespaceName, deployment, "false");
         /*      ExtensionsV1beta1Deployment ev1bd = new ExtensionsV1beta1Deployment();
         V1ObjectMeta v1om = new V1ObjectMeta();

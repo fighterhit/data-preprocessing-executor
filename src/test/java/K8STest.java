@@ -25,7 +25,8 @@ public class K8STest {
     CoreV1Api api = new CoreV1Api(client);
     ExtensionsV1beta1Api beta1api = new ExtensionsV1beta1Api(client);
 
-    String yamlContent = FileUtils.readFileToString(new File("G:\\IdeaProjects\\data-preprocessing-executor\\src\\test\\java\\logcollection.yaml"), "UTF-8");
+//    String yamlContent = FileUtils.readFileToString(new File("G:\\IdeaProjects\\data-preprocessing-executor\\src\\test\\java\\logcollection.yaml"), "UTF-8");
+    String yamlContent = FileUtils.readFileToString(new File("/root/IdeaProjects/data-preprocessing-executor/src/test/java/logcollection.yaml"), "UTF-8");
 
     public K8STest() throws IOException {
     }

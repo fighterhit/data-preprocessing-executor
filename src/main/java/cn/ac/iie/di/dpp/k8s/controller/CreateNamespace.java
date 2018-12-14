@@ -6,6 +6,7 @@
 package cn.ac.iie.di.dpp.k8s.controller;
 
 import cn.ac.iie.di.commons.httpserver.framework.handler.HandlerI;
+import cn.ac.iie.di.dpp.proxy.RegistryProxyServer;
 import io.kubernetes.client.models.V1Namespace;
 import io.kubernetes.client.models.V1ResourceQuota;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -19,7 +20,6 @@ import java.util.Map;
 
 import static cn.ac.iie.di.dpp.main.ProxyMain.api;
 import static cn.ac.iie.di.dpp.main.ProxyMain.k8sUtil;
-import cn.ac.iie.di.dpp.proxy.RegistryProxyServer;
 
 /**
  *
@@ -47,6 +47,7 @@ public class CreateNamespace implements HandlerI {
             LOGGER.info("Command is CreateNamespace and spec is \n"
                     + "namespaceName:" + namespaceName + "\n"
                     + "podLimit:" + podLimit + "\n"
+                    + "cpuRequest:" + cpuRequest + "\n"
                     + "memoryRequest:" + memoryRequest + "\n"
                     + "cpuLimit:" + cpuLimit + "\n"
                     + "memoryLimit:" + memoryLimit);
