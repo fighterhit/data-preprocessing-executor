@@ -24,10 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.ac.iie.di.dpp.main.ProxyMain.api;
 import static cn.ac.iie.di.dpp.main.ProxyMain.beta1api;
@@ -179,14 +176,15 @@ public class K8sUtil {
         V1ConfigMap configMap = (V1ConfigMap) ls.get(1);
 
         //configmap
-        String configMapName = new StringBuffer(namespaceName)
+        StringBuffer configMapName = new StringBuffer(namespaceName)
                 .append(".")
                 .append(deploymentName)
                 .append(".")
-                .append("fc")
-                .toString();
-        configMap.getMetadata().setName(configMapName);
-        configMap.getData().put("filebeat.yml", "filebeat.prospectors:\n- input_type: log\n  paths:\n    - \"/log/*\"\noutput.elasticsearch:\n  hosts: [\"" + conf.getString(Constants.ES_MASTER) + "\"]\n  index: \"" + configMapName + "\"");
+                .append("fc");
+        configMap.getMetadata().setName(configMapName.toString());
+//        configMap.getData().put("filebeat.yml", "filebeat.prospectors:\n- input_type: log\n  paths:\n    - \"/log/*\"\noutput.elasticsearch:\n  hosts: [\"" + conf.getString(Constants.ES_MASTER) + "\"]\n  index: \"" + configMapName + "\"");
+//        configMap.getData().put("filebeat.yml", "filebeat.prospectors:\n- input_type: log\n  paths:\n    - \"/log/*\"\noutput.redis:\n  hosts: "+ Arrays.toString(conf.getStringArray("redis.master"))+"\n  key: "+configMapName+"\n  db: 0");
+        configMap.getData().put("filebeat.yml", "filebeat.prospectors:\n- input_type: log\n  paths:\n    - \"/log/*\"\noutput.redis:\n  hosts: "+ Arrays.toString(conf.getStringArray("redis.master"))+"\n  key: filebeat\n  db: 0");
 
         //deploment
         deployment.getMetadata().setName(deploymentName);
@@ -209,7 +207,7 @@ public class K8sUtil {
 
         V1Container filebeatContainer = containers.get(1);
         filebeatContainer.setImage(conf.getString(Constants.FILEBEAT_IMAGE));
-        spec.getVolumes().get(1).getConfigMap().setName(configMapName);
+        spec.getVolumes().get(1).getConfigMap().setName(configMapName.toString());
 
         V1ConfigMap v1cf = api.createNamespacedConfigMap(namespaceName, configMap, null);
         LOGGER.info("ConfigMap " + v1cf.getMetadata().getName() + " is created.\n" + v1cf);
@@ -258,15 +256,15 @@ public class K8sUtil {
         V1ConfigMap configMap = (V1ConfigMap) ls.get(1);
 
         //configmap
-        String configMapName = new StringBuffer(namespaceName)
+        StringBuffer configMapName = new StringBuffer(namespaceName)
                 .append(".")
                 .append(deploymentName)
                 .append(".")
-                .append("fc")
-                .toString();
-        configMap.getMetadata().setName(configMapName);
-        configMap.getData().put("filebeat.yml", "filebeat.prospectors:\n- input_type: log\n  paths:\n    - \"/log/*\"\noutput.elasticsearch:\n  hosts: [\"" + conf.getString(Constants.ES_MASTER) + "\"]\n  index: \"" + configMapName + "\"");
-
+                .append("fc");
+        configMap.getMetadata().setName(configMapName.toString());
+//        configMap.getData().put("filebeat.yml", "filebeat.prospectors:\n- input_type: log\n  paths:\n    - \"/log/*\"\noutput.elasticsearch:\n  hosts: [\"" + conf.getString(Constants.ES_MASTER) + "\"]\n  index: \"" + configMapName + "\"");
+//        configMap.getData().put("filebeat.yml", "filebeat.prospectors:\n- input_type: log\n  paths:\n    - \"/log/*\"\noutput.redis:\n  hosts: "+ Arrays.toString(conf.getStringArray("redis.master"))+"\n  key: "+configMapName+"\n  db: 0");
+        configMap.getData().put("filebeat.yml", "filebeat.prospectors:\n- input_type: log\n  paths:\n    - \"/log/*\"\noutput.redis:\n  hosts: "+ Arrays.toString(conf.getStringArray("redis.master"))+"\n  key: filebeat\n  db: 0");
         //deploment
         deployment.getMetadata().setName(deploymentName);
         deployment.getMetadata().setNamespace(namespaceName);
@@ -292,7 +290,7 @@ public class K8sUtil {
 
         V1Container filebeatContainer = containers.get(1);
         filebeatContainer.setImage(conf.getString(Constants.FILEBEAT_IMAGE));
-        spec.getVolumes().get(1).getConfigMap().setName(configMapName);
+        spec.getVolumes().get(1).getConfigMap().setName(configMapName.toString());
 
         V1ConfigMap v1cf = api.createNamespacedConfigMap(namespaceName, configMap, null);
         LOGGER.info("ConfigMap " + v1cf.getMetadata().getName() + " is created.\n" + v1cf);

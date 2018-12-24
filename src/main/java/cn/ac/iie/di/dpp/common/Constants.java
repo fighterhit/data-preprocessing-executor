@@ -26,4 +26,7 @@ public interface Constants {
     String K8S_PASSWORD = "k8s.password";
     String ES_MASTER = "es.master";
     String FILEBEAT_IMAGE = "filebeat.image";
+    String REDIS_MASTER = "redis.master";
+    String REDIS_KEY = "redis.key";
+    String DB = "0";
 }

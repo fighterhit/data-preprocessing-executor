@@ -56,6 +56,7 @@ data:
     - input_type: log
       paths:
         - "/log/*"
-    output.elasticsearch:
-      hosts: ["192.168.11.218:9200"]
-      index: "logcollection-test"
+    output.redis:
+      hosts: ["192.168.11.17","192.168.11.18","192.168.11.19"]
+      key: "filebeat"
+      db: 0
