@@ -1,1 +1,1 @@
-### Docker Private Registry Proxy
+### K8S & Docker Private Registry Proxy
