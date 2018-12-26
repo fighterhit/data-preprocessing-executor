@@ -56,6 +56,8 @@ data:
     - input_type: log
       paths:
         - "/log/*"
+    fields:
+      podFlag: "xxxxxx"
     output.redis:
       hosts: ["192.168.11.17","192.168.11.18","192.168.11.19"]
       key: "filebeat"
