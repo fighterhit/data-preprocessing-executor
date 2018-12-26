@@ -6,6 +6,7 @@
 package cn.ac.iie.di.dpp.k8s.controller;
 
 import cn.ac.iie.di.commons.httpserver.framework.handler.HandlerI;
+import cn.ac.iie.di.dpp.proxy.RegistryProxyServer;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.eclipse.jetty.server.Request;
 import org.slf4j.Logger;
@@ -17,7 +18,6 @@ import java.util.Map;
 
 import static cn.ac.iie.di.dpp.main.ProxyMain.api;
 import static cn.ac.iie.di.dpp.main.ProxyMain.k8sUtil;
-import cn.ac.iie.di.dpp.proxy.RegistryProxyServer;
 
 /**
  *
@@ -36,6 +36,7 @@ public class DeleteNamespace implements HandlerI {
             Map<String, String[]> paramterMap = request.getParameterMap();
 
             String namespaceName = paramterMap.get("namespaceName")[0];
+            LOGGER.info("namespace: {} will be deleted.", namespaceName);
             k8sUtil.DeleteNameSpace(api, namespaceName);
             String answer = new StringBuilder().append(namespaceName).toString();
 

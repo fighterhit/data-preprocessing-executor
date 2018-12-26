@@ -6,6 +6,7 @@
 package cn.ac.iie.di.dpp.k8s.controller;
 
 import cn.ac.iie.di.commons.httpserver.framework.handler.HandlerI;
+import cn.ac.iie.di.dpp.proxy.RegistryProxyServer;
 import io.kubernetes.client.models.V1Status;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.eclipse.jetty.server.Request;
@@ -17,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 import static cn.ac.iie.di.dpp.main.ProxyMain.*;
-import cn.ac.iie.di.dpp.proxy.RegistryProxyServer;
 
 /**
  *
@@ -39,6 +39,7 @@ public class DeleteDeployment implements HandlerI {
             String deploymentName = paramterMap.get("deploymentName")[0];
 
             k8sUtil.DeleteHorizontalPodAutoscaler(asV2Api, deploymentName, namespaceName);
+            LOGGER.info("deployment: {} in namespace {} will be deleted.", deploymentName, namespaceName);
             V1Status deleteServiceStatus = k8sUtil.DeleteService(api, deploymentName, namespaceName);
             V1Status deleteDeploymentStatus = k8sUtil.DeleteDeployment(appsV1Api, deploymentName, namespaceName);
 

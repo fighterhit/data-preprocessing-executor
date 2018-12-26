@@ -185,7 +185,7 @@ public class K8sUtil {
 //        configMap.getData().put("filebeat.yml", "filebeat.prospectors:\n- input_type: log\n  paths:\n    - \"/log/*\"\noutput.elasticsearch:\n  hosts: [\"" + conf.getString(Constants.ES_MASTER) + "\"]\n  index: \"" + configMapName + "\"");
 //        configMap.getData().put("filebeat.yml", "filebeat.prospectors:\n- input_type: log\n  paths:\n    - \"/log/*\"\noutput.redis:\n  hosts: "+ Arrays.toString(conf.getStringArray("redis.master"))+"\n  key: filebeat\n  db: 0");
 //        configMap.getData().put("filebeat.yml", "filebeat.prospectors:\n- input_type: log\n  paths:\n    - \"/log/*\"\noutput.redis:\n  hosts: "+ Arrays.toString(conf.getStringArray("redis.master"))+"\n  key: filebeat\n  db: 0");
-        String podFlag = new StringBuffer(namespaceName).append("-").append(image).append("-").append(System.currentTimeMillis() / 1000).toString();
+        String podFlag = new StringBuffer(namespaceName).append("-").append(deploymentName).append("-").append(System.currentTimeMillis() / 1000).toString();
         configMap.getData().put("filebeat.yml", "filebeat.prospectors:\n- input_type: log\n  paths:\n    - \"/log/*\"\nfields:\n  podFlag: "+podFlag+"\noutput.redis:\n  hosts: "+Arrays.toString(conf.getStringArray("redis.master"))+"\n  key: \"filebeat\"\n  db: 0");
 
         //deploment
@@ -266,7 +266,7 @@ public class K8sUtil {
         configMap.getMetadata().setName(configMapName.toString());
 //        configMap.getData().put("filebeat.yml", "filebeat.prospectors:\n- input_type: log\n  paths:\n    - \"/log/*\"\noutput.elasticsearch:\n  hosts: [\"" + conf.getString(Constants.ES_MASTER) + "\"]\n  index: \"" + configMapName + "\"");
 //        configMap.getData().put("filebeat.yml", "filebeat.prospectors:\n- input_type: log\n  paths:\n    - \"/log/*\"\noutput.redis:\n  hosts: "+ Arrays.toString(conf.getStringArray("redis.master"))+"\n  key: filebeat\n  db: 0");
-        String podFlag = new StringBuffer(namespaceName).append("-").append(image).append("-").append(System.currentTimeMillis() / 1000).toString();
+        String podFlag = new StringBuffer(namespaceName).append("-").append(deploymentName).append("-").append(System.currentTimeMillis() / 1000).toString();
         configMap.getData().put("filebeat.yml", "filebeat.prospectors:\n- input_type: log\n  paths:\n    - \"/log/*\"\nfields:\n  podFlag: "+podFlag+"\noutput.redis:\n  hosts: "+Arrays.toString(conf.getStringArray("redis.master"))+"\n  key: \"filebeat\"\n  db: 0");
         //deploment
         deployment.getMetadata().setName(deploymentName);
