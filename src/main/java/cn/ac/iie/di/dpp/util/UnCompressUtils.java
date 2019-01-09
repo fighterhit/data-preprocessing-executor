@@ -28,6 +28,8 @@ public class UnCompressUtils {
         }
 
         destDir = destDir.endsWith(File.separator) ? destDir : destDir + File.separator;
+        //先创建父目录，防止解压时先遇到文件而无法复制文件
+        new File(destDir).mkdirs();
         TarArchiveInputStream is = null;
 //        List<String> fileNames = new ArrayList<String>();
 
@@ -44,6 +46,7 @@ public class UnCompressUtils {
                 } else {
                     OutputStream os = null;
                     try {
+                        //父目录destDir必须存在，否则os为null
                         os = new BufferedOutputStream(new FileOutputStream(new File(destDir, entry.getName())), BUFFER_SIZE);
                         IOUtils.copy(is, os);
                     } finally {
